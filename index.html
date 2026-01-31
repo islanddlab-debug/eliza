@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#FF9F1C">
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦁</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦁</text></svg>">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,8 +26,6 @@
             --card-bg: #FFFFFF;
             --text-main: #2D3436;
             --side-gap: 20px;
-            --grey-btn: #e0e0e0;
-            --grey-text: #999;
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -61,6 +59,7 @@
             padding: 10px var(--side-gap) 0 var(--side-gap);
         }
 
+        /* 增加墊片高度，解決手機版挑戰模式被擋住的問題 */
         .spacer { height: 160px; }
 
         .top-row {
@@ -84,7 +83,6 @@
         }
         .search-input:focus { border-color: var(--secondary); background: white; }
 
-        /* Tools Row - UX Improved */
         .tools-row {
             display: flex; gap: 8px; overflow-x: auto; align-items: center;
             padding-bottom: 10px; scrollbar-width: none;
@@ -92,7 +90,7 @@
         .tools-row::-webkit-scrollbar { display: none; }
 
         .tool-btn {
-            background: #f0f0f0; border: none; color: #888; /* 預設灰底 */
+            background: #f0f0f0; border: none; color: #888;
             padding: 10px 16px; border-radius: 25px; cursor: pointer;
             font-size: 0.95rem; display: flex; align-items: center; gap: 6px;
             white-space: nowrap; font-weight: 600; transition: 0.2s; flex-shrink: 0;
@@ -100,14 +98,8 @@
         }
         .tool-btn:active { transform: scale(0.95); }
 
-        /* ACTIVE STATES - UX Writing Colors */
-        /* 挑戰模式：橘色 */
         #btnQuiz.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(255, 159, 28, 0.3); }
-        
-        /* 翻翻卡：紫色/粉色 */
-        #btnFocus { background: #E3F2FD; color: #1565C0; } /* 預設就有點顏色比較好找 */
-        
-        /* 中英顯示：綠色 */
+        #btnFocus { background: #E3F2FD; color: #1565C0; }
         .lang-btn.active { background: #E8F5E9; color: #2E7D32; border: 1px solid #4CAF50; }
 
         .nav-scroller { 
@@ -137,6 +129,7 @@
             display: none; background: var(--accent); padding: 15px;
             text-align: center; margin: 15px 0; border-radius: 15px;
             box-shadow: 0 4px 0 #e5ac5e; animation: bounceIn 0.5s;
+            margin-bottom: 20px; /* 增加底部距離 */
         }
         @keyframes bounceIn { 0% {transform: scale(0.8); opacity:0;} 70% {transform: scale(1.05);} 100% {transform: scale(1); opacity:1;} }
         #quizQuestion { font-size: 1.5rem; font-weight: 600; color: #444; }
@@ -152,7 +145,8 @@
             .top-row { flex-direction: column; align-items: stretch; }
             .search-box { max-width: 100%; }
             h1 { justify-content: center; margin-bottom: 5px; }
-            .spacer { height: 180px; }
+            /* 手機版墊片加高，避免擋住挑戰模式 */
+            .spacer { height: 220px; } 
         }
 
         .card {
@@ -164,22 +158,25 @@
         }
         .card:active { transform: scale(0.98); }
         
+        /* 規則標籤微調：字小一點，高度窄一點，避免擠壓內容 */
         .rule-tag {
-            font-size: 0.85rem; font-weight: 600; padding: 5px 0;
+            font-size: 0.8rem; font-weight: 600; padding: 4px 0;
             color: #fff; background: rgba(0,0,0,0.1); width: 100%; letter-spacing: 1px;
         }
 
         .card-img {
             flex-grow: 1; display: flex; align-items: center; justify-content: center;
-            font-size: 4.5rem; background: linear-gradient(180deg, #fafafa 0%, #fff 100%);
+            font-size: 4.2rem; /* Emoji 稍微縮小一點點 */
+            background: linear-gradient(180deg, #fafafa 0%, #fff 100%);
             width: 100%; transition: background 0.3s;
         }
-        .card-body { padding: 12px 5px; border-top: 1px solid rgba(0,0,0,0.05); background: #fff; }
+        .card-body { padding: 10px 5px; border-top: 1px solid rgba(0,0,0,0.05); background: #fff; }
         
-        .en-word { font-size: 1.4rem; font-weight: 600; color: #333; display: block; margin-bottom: 2px; transition: opacity 0.3s; }
-        .zh-word { font-size: 1.1rem; color: #888; font-weight: 500; transition: opacity 0.3s; font-family: 'Microsoft JhengHei', sans-serif; }
+        /* 單字字體大小微調 */
+        .en-word { font-size: 1.3rem; font-weight: 600; color: #333; display: block; margin-bottom: 2px; transition: opacity 0.3s; line-height: 1.2;}
+        .zh-word { font-size: 1rem; color: #888; font-weight: 500; transition: opacity 0.3s; font-family: 'Microsoft JhengHei', sans-serif; }
 
-        .phonics-card .en-word { font-size: 1.6rem; color: #333; } 
+        .phonics-card .en-word { font-size: 1.5rem; color: #333; } 
         .flag-card .card-img img { width: 100%; height: 100%; object-fit: cover; }
         
         .hide-zh .zh-word { opacity: 0; }
@@ -214,18 +211,20 @@
         .focus-zh { font-size: 1.6rem; color: #666; margin-bottom: 20px; transition: opacity 0.3s; }
         .focus-flag-img { width: 90%; height: auto; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
-        /* 愛心按鈕 (改到左上角，且移除外框) */
+        /* 愛心按鈕樣式 (移到底部控制列，統一樣式) */
         .fav-btn {
-            position: absolute; top: 20px; left: 20px;
-            background: white; width: 50px; height: 50px; border-radius: 50%;
-            border: 2px solid #f0f0f0; color: #ddd; font-size: 1.8rem;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 5;
-            transition: 0.2s;
+            width: 45px; height: 45px; border-radius: 50%;
+            background: white; border: 2px solid #eee; color: #ddd;
+            font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s;
         }
-        .fav-btn.active { color: var(--love); border-color: #f0f0f0; } /* 只有愛心變色 */
+        .fav-btn:active { transform: scale(0.9); }
+        .fav-btn.active { color: var(--love); border-color: var(--love); background: #FFF0F0; }
 
-        .focus-controls { display: flex; gap: 20px; align-items: center; justify-content: center; margin-top: 10px; }
+        .focus-controls { 
+            display: flex; gap: 20px; align-items: center; justify-content: center; margin-top: 10px; 
+            width: 100%;
+        }
 
         .snail-btn {
             width: 45px; height: 45px; border-radius: 50%;
@@ -327,19 +326,20 @@
     <div class="focus-card" id="focusCard" onclick="handleFocusClick()">
         <div class="focus-card-bg" id="focusBg"></div>
         <div class="focus-content-layer">
-            <button class="fav-btn" id="btnFav" onclick="toggleFavorite(event)">❤️</button>
             <div class="focus-rule" id="focusRule"></div>
             <div id="focusContent"></div> 
             
             <div class="focus-controls">
                 <button class="snail-btn" onclick="playSlow(event)">🐌</button>
+                
                 <div class="focus-mic-container" id="focusMicContainer">
                     <svg class="focus-progress-ring" width="70" height="70">
                        <circle class="focus-progress-ring__circle" stroke="#FF5252" stroke-width="4" fill="transparent" r="32" cx="35" cy="35"/>
                     </svg>
                     <button class="focus-mic-btn" onclick="toggleRecord(event, this)">🎤</button>
                 </div>
-                <div style="width:45px"></div> 
+
+                <button class="fav-btn" id="btnFav" onclick="toggleFavorite(event)">❤️</button>
             </div>
         </div>
     </div>
@@ -459,23 +459,82 @@
             { rule: "fl", en: "Flower", zh: "花", icon: "🌻", speak: "f-l, Flower" },
             { rule: "st", en: "Star", zh: "星星", icon: "⭐", speak: "s-t, Star" }
         ],
-        "🦁 野生動物 Wild": [
+        // --- 興趣主題 ---
+        "🌍 世界地圖 World": [
+            { en: "Taiwan", zh: "台灣", icon: "🇹🇼", code: "tw" },
+            { en: "USA", zh: "美國", icon: "🇺🇸", code: "us" },
+            { en: "Japan", zh: "日本", icon: "🇯🇵", code: "jp" },
+            { en: "China", zh: "中國", icon: "🇨🇳", code: "cn" },
+            { en: "UK", zh: "英國", icon: "🇬🇧", code: "gb" },
+            { en: "France", zh: "法國", icon: "🇫🇷", code: "fr" },
+            { en: "Germany", zh: "德國", icon: "🇩🇪", code: "de" },
+            { en: "Italy", zh: "義大利", icon: "🇮🇹", code: "it" },
+            { en: "Canada", zh: "加拿大", icon: "🇨🇦", code: "ca" },
+            { en: "Australia", zh: "澳洲", icon: "🇦🇺", code: "au" },
+            { en: "India", zh: "印度", icon: "🇮🇳", code: "in" },
+            { en: "Brazil", zh: "巴西", icon: "🇧🇷", code: "br" },
+            { en: "Egypt", zh: "埃及", icon: "🇪🇬", code: "eg" },
+            { en: "Korea", zh: "韓國", icon: "🇰🇷", code: "kr" },
+            { en: "Russia", zh: "俄羅斯", icon: "🇷🇺", code: "ru" },
+            { en: "Singapore", zh: "新加坡", icon: "🇸🇬", code: "sg" },
+            { en: "Thailand", zh: "泰國", icon: "🇹🇭", code: "th" },
+            { en: "World", zh: "世界", icon: "🌎" }
+        ],
+        "🦖 恐龍 Dinosaurs": [
+            { en: "T-Rex", zh: "暴龍", icon: "🦖" },
+            { en: "Triceratops", zh: "三角龍", icon: "🦕" },
+            { en: "Brachiosaurus", zh: "腕龍", icon: "🦕" },
+            { en: "Stegosaurus", zh: "劍龍", icon: "🦎" },
+            { en: "Pteranodon", zh: "翼龍", icon: "🦅" },
+            { en: "Velociraptor", zh: "迅猛龍", icon: "🦖" },
+            { en: "Dinosaur Egg", zh: "恐龍蛋", icon: "🥚" },
+            { en: "Fossil", zh: "化石", icon: "🦴" },
+            { en: "Volcano", zh: "火山", icon: "🌋" }
+        ],
+        "🪐 宇宙 Space": [
+            { en: "Sun", zh: "太陽", icon: "☀️" },
+            { en: "Moon", zh: "月亮", icon: "🌙" },
+            { en: "Earth", zh: "地球", icon: "🌍" },
+            { en: "Star", zh: "星星", icon: "⭐" },
+            { en: "Rocket", zh: "火箭", icon: "🚀" },
+            { en: "Astronaut", zh: "太空人", icon: "🧑‍🚀" },
+            { en: "Alien", zh: "外星人", icon: "👽" },
+            { en: "UFO", zh: "飛碟", icon: "🛸" },
+            { en: "Planet", zh: "行星", icon: "🪐" },
+            { en: "Mars", zh: "火星", icon: "🔴" }
+        ],
+        "🚒 交通 Vehicles": [
+            { en: "Car", zh: "汽車", icon: "🚗" },
+            { en: "Bus", zh: "公車", icon: "🚌" },
+            { en: "Police Car", zh: "警車", icon: "🚓" },
+            { en: "Fire Truck", zh: "消防車", icon: "🚒" },
+            { en: "Ambulance", zh: "救護車", icon: "🚑" },
+            { en: "Taxi", zh: "計程車", icon: "🚕" },
+            { en: "Truck", zh: "卡車", icon: "🚚" },
+            { en: "Train", zh: "火車", icon: "🚂" },
+            { en: "Airplane", zh: "飛機", icon: "✈️" },
+            { en: "Helicopter", zh: "直升機", icon: "🚁" },
+            { en: "Boat", zh: "船", icon: "🚢" },
+            { en: "Bicycle", zh: "腳踏車", icon: "🚲" },
+            { en: "Motorcycle", zh: "機車", icon: "🛵" },
+            { en: "Scooter", zh: "滑板車", icon: "🛴" },
+            { en: "Excavator", zh: "挖土機", icon: "🏗️" },
+            { en: "Tractor", zh: "拖拉機", icon: "🚜" }
+        ],
+        "🦁 動物園 Zoo": [
             { en: "Lion", zh: "獅子", icon: "🦁" },
             { en: "Tiger", zh: "老虎", icon: "🐯" },
             { en: "Elephant", zh: "大象", icon: "🐘" },
             { en: "Monkey", zh: "猴子", icon: "🐒" },
-            { en: "Gorilla", zh: "大猩猩", icon: "🦍" },
             { en: "Zebra", zh: "斑馬", icon: "🦓" },
             { en: "Giraffe", zh: "長頸鹿", icon: "🦒" },
             { en: "Bear", zh: "熊", icon: "🐻" },
             { en: "Panda", zh: "熊貓", icon: "🐼" },
             { en: "Kangaroo", zh: "袋鼠", icon: "🦘" },
-            { en: "Koala", zh: "無尾熊", icon: "🐨" },
-            { en: "Crocodile", zh: "鱷魚", icon: "🐊" },
             { en: "Hippo", zh: "河馬", icon: "🦛" },
-            { en: "Rhino", zh: "犀牛", icon: "🦏" },
-            { en: "Camel", zh: "駱駝", icon: "🐫" },
-            { en: "Sloth", zh: "樹懶", icon: "🦥" }
+            { en: "Crocodile", zh: "鱷魚", icon: "🐊" },
+            { en: "Penguin", zh: "企鵝", icon: "🐧" },
+            { en: "Koala", zh: "無尾熊", icon: "🐨" }
         ],
         "🐷 農場動物 Farm": [
             { en: "Dog", zh: "狗", icon: "🐶" },
@@ -644,49 +703,15 @@
             { en: "Hot", zh: "熱", icon: "🥵" },
             { en: "Love", zh: "愛", icon: "🥰" }
         ],
-        "🚒 交通 Vehicles": [
-            { en: "Car", zh: "汽車", icon: "🚗" },
-            { en: "Taxi", zh: "計程車", icon: "🚕" },
-            { en: "Bus", zh: "公車", icon: "🚌" },
-            { en: "Police Car", zh: "警車", icon: "🚓" },
-            { en: "Fire Truck", zh: "消防車", icon: "🚒" },
-            { en: "Ambulance", zh: "救護車", icon: "🚑" },
-            { en: "Truck", zh: "卡車", icon: "🚚" },
-            { en: "Train", zh: "火車", icon: "🚂" },
-            { en: "Bullet Train", zh: "高鐵", icon: "🚅" },
-            { en: "Bicycle", zh: "腳踏車", icon: "🚲" },
-            { en: "Motorcycle", zh: "機車", icon: "🛵" },
-            { en: "Airplane", zh: "飛機", icon: "✈️" },
-            { en: "Helicopter", zh: "直升機", icon: "🚁" },
-            { en: "Rocket", zh: "火箭", icon: "🚀" },
-            { en: "Boat", zh: "船", icon: "🚢" },
-            { en: "Tractor", zh: "拖拉機", icon: "🚜" }
+        "👷 職業 Jobs": [
+            { en: "Doctor", zh: "醫生", icon: "👨‍⚕️" },
+            { en: "Police", zh: "警察", icon: "👮" },
+            { en: "Firefighter", zh: "消防員", icon: "🧑‍🚒" },
+            { en: "Teacher", zh: "老師", icon: "👩‍🏫" },
+            { en: "Cook", zh: "廚師", icon: "👨‍🍳" },
+            { en: "Farmer", zh: "農夫", icon: "👨‍🌾" }
         ],
-        "🦖 恐龍 Dinosaurs": [
-            { en: "T-Rex", zh: "暴龍", icon: "🦖" },
-            { en: "Triceratops", zh: "三角龍", icon: "🦕" },
-            { en: "Brachiosaurus", zh: "腕龍", icon: "🦕" },
-            { en: "Stegosaurus", zh: "劍龍", icon: "🦎" },
-            { en: "Pteranodon", zh: "翼龍", icon: "🦅" },
-            { en: "Velociraptor", zh: "迅猛龍", icon: "🦖" },
-            { en: "Dinosaur Egg", zh: "恐龍蛋", icon: "🥚" },
-            { en: "Fossil", zh: "化石", icon: "🦴" },
-            { en: "Volcano", zh: "火山", icon: "🌋" }
-        ],
-        "🌍 世界地圖 World": [
-            { en: "Taiwan", zh: "台灣", icon: "🇹🇼", code: "tw" },
-            { en: "USA", zh: "美國", icon: "🇺🇸", code: "us" },
-            { en: "Japan", zh: "日本", icon: "🇯🇵", code: "jp" },
-            { en: "China", zh: "中國", icon: "🇨🇳", code: "cn" },
-            { en: "UK", zh: "英國", icon: "🇬🇧", code: "gb" },
-            { en: "France", zh: "法國", icon: "🇫🇷", code: "fr" },
-            { en: "Germany", zh: "德國", icon: "🇩🇪", code: "de" },
-            { en: "Italy", zh: "義大利", icon: "🇮🇹", code: "it" },
-            { en: "Canada", zh: "加拿大", icon: "🇨🇦", code: "ca" },
-            { en: "Australia", zh: "澳洲", icon: "🇦🇺", code: "au" },
-            { en: "Korea", zh: "韓國", icon: "🇰🇷", code: "kr" },
-            { en: "World", zh: "世界", icon: "🌎" }
-        ],
+        // --- 認知基礎 ---
         "🔢 數字 Numbers": [
             { en: "One", zh: "1", speak: "One", icon: "1️⃣" },
             { en: "Two", zh: "2", speak: "Two", icon: "2️⃣" },
@@ -709,14 +734,6 @@
             { en: "Pink", zh: "粉紅色", icon: "🌸" },
             { en: "Black", zh: "黑色", icon: "⬛" },
             { en: "White", zh: "白色", icon: "⬜" }
-        ],
-        "👷 職業 Jobs": [
-            { en: "Doctor", zh: "醫生", icon: "👨‍⚕️" },
-            { en: "Police", zh: "警察", icon: "👮" },
-            { en: "Firefighter", zh: "消防員", icon: "🧑‍🚒" },
-            { en: "Teacher", zh: "老師", icon: "👩‍🏫" },
-            { en: "Cook", zh: "廚師", icon: "👨‍🍳" },
-            { en: "Farmer", zh: "農夫", icon: "👨‍🌾" }
         ]
     };
 
@@ -732,9 +749,9 @@
     let focusIndex = 0;
     let activeItems = []; 
     
-    // 錄音相關 (全域變數)
+    // 錄音相關
     let mediaRecorder = null; 
-    const playbackAudio = new Audio(); // 共用播放器
+    const playbackAudio = new Audio(); 
 
     // 最愛
     let favorites = JSON.parse(localStorage.getItem('eliza_favs')) || [];
@@ -996,7 +1013,7 @@
         if(activeItems.length === 0) return;
         const item = activeItems[focusIndex];
         const text = item.speak ? item.speak : item.en;
-        speak(text, 0.5); 
+        speak(text, 0.3); // 調整至 0.3 倍速
     }
 
     function handleClick(item, cardElem, index) {

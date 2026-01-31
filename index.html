@@ -26,6 +26,8 @@
             --card-bg: #FFFFFF;
             --text-main: #2D3436;
             --side-gap: 20px;
+            --grey-btn: #e0e0e0;
+            --grey-text: #999;
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -45,7 +47,7 @@
         /* Header Auto-Hide */
         .header-area {
             position: fixed; top: 0; left: 0; z-index: 100;
-            background: rgba(255,255,255,0.95);
+            background: rgba(255,255,255,0.98);
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
             backdrop-filter: blur(10px);
             width: 100%;
@@ -82,23 +84,31 @@
         }
         .search-input:focus { border-color: var(--secondary); background: white; }
 
+        /* Tools Row - UX Improved */
         .tools-row {
-            display: flex; gap: 10px; overflow-x: auto; align-items: center;
+            display: flex; gap: 8px; overflow-x: auto; align-items: center;
             padding-bottom: 10px; scrollbar-width: none;
         }
         .tools-row::-webkit-scrollbar { display: none; }
 
         .tool-btn {
-            background: #fff; border: 2px solid #eee; color: #555;
-            padding: 10px 18px; border-radius: 25px; cursor: pointer;
+            background: #f0f0f0; border: none; color: #888; /* 預設灰底 */
+            padding: 10px 16px; border-radius: 25px; cursor: pointer;
             font-size: 0.95rem; display: flex; align-items: center; gap: 6px;
             white-space: nowrap; font-weight: 600; transition: 0.2s; flex-shrink: 0;
             font-family: 'Fredoka', sans-serif;
         }
-        .tool-btn:active { transform: scale(0.95); background: #f0f0f0; }
+        .tool-btn:active { transform: scale(0.95); }
+
+        /* ACTIVE STATES - UX Writing Colors */
+        /* 挑戰模式：橘色 */
+        #btnQuiz.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(255, 159, 28, 0.3); }
         
-        #btnMode { background: #E3F2FD; color: #1565C0; border-color: #BBDEFB; }
-        .btn-quiz { background: var(--primary); color: white; border: none; }
+        /* 翻翻卡：紫色/粉色 */
+        #btnFocus { background: #E3F2FD; color: #1565C0; } /* 預設就有點顏色比較好找 */
+        
+        /* 中英顯示：綠色 */
+        .lang-btn.active { background: #E8F5E9; color: #2E7D32; border: 1px solid #4CAF50; }
 
         .nav-scroller { 
             overflow-x: auto; white-space: nowrap; 
@@ -204,17 +214,16 @@
         .focus-zh { font-size: 1.6rem; color: #666; margin-bottom: 20px; transition: opacity 0.3s; }
         .focus-flag-img { width: 90%; height: auto; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
-        /* 愛心按鈕 (樣式修正：移除 active 時的邊框顏色) */
+        /* 愛心按鈕 (改到左上角，且移除外框) */
         .fav-btn {
-            position: absolute; top: 20px; right: 20px;
+            position: absolute; top: 20px; left: 20px;
             background: white; width: 50px; height: 50px; border-radius: 50%;
-            border: 2px solid #f0f0f0; color: #ddd; font-size: 1.5rem;
+            border: 2px solid #f0f0f0; color: #ddd; font-size: 1.8rem;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 5;
             transition: 0.2s;
         }
-        /* 點擊後只變紅心，不變邊框，比較好看 */
-        .fav-btn.active { color: var(--love); border-color: #f0f0f0; transform: scale(1.1); }
+        .fav-btn.active { color: var(--love); border-color: #f0f0f0; } /* 只有愛心變色 */
 
         .focus-controls { display: flex; gap: 20px; align-items: center; justify-content: center; margin-top: 10px; }
 
@@ -255,11 +264,18 @@
             .focus-nav-btn { top: 88%; background: rgba(255,255,255,0.9); }
             .prev-btn { left: 15%; } .next-btn { right: 15%; }
         }
-        .close-circle-btn {
-            position: absolute; top: 20px; left: 20px;
-            width: 40px; height: 40px; border-radius: 50%; background: #eee;
-            border: none; font-weight: bold; cursor: pointer; color: #555; z-index: 502;
+        
+        /* 關閉按鈕 (大叉叉，右上角) */
+        .close-overlay-btn {
+            position: absolute; top: 20px; right: 20px;
+            width: 50px; height: 50px; border-radius: 50%; 
+            background: rgba(255,255,255,0.8); backdrop-filter: blur(5px);
+            border: none; font-size: 1.8rem; font-weight: bold; 
+            cursor: pointer; color: #555; z-index: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
         }
+        .close-overlay-btn:active { transform: scale(0.9); }
 
         .modal-content {
             background: white; padding: 20px; border-radius: 25px;
@@ -303,9 +319,11 @@
 </div>
 
 <div id="focusOverlay">
-    <button class="close-circle-btn" onclick="toggleFocusMode()">✕</button>
+    <button class="close-overlay-btn" onclick="toggleFocusMode()">✕</button>
+    
     <button class="focus-nav-btn prev-btn" onclick="focusNav(-1)">❮</button>
     <button class="focus-nav-btn next-btn" onclick="focusNav(1)">❯</button>
+    
     <div class="focus-card" id="focusCard" onclick="handleFocusClick()">
         <div class="focus-card-bg" id="focusBg"></div>
         <div class="focus-content-layer">
@@ -337,9 +355,12 @@
         </div>
         
         <div class="tools-row">
-            <button class="tool-btn btn-quiz" onclick="toggleQuiz()">🎮 測驗</button>
-            <button class="tool-btn" id="btnMode" onclick="cycleMode()">📖 顯示：中+英</button>
-            <button class="tool-btn" id="btnFocus" onclick="toggleFocusMode()">🔲 專注模式</button>
+            <button class="tool-btn" id="btnQuiz" onclick="toggleQuiz()">⚔️ 挑戰模式</button>
+            
+            <button class="tool-btn lang-btn active" id="btnZh" onclick="toggleZh()">中文</button>
+            <button class="tool-btn lang-btn active" id="btnEn" onclick="toggleEn()">英文</button>
+
+            <button class="tool-btn" id="btnFocus" onclick="toggleFocusMode()">🃏 翻翻卡</button>
         </div>
 
         <div class="nav-scroller" id="navBar"></div>
@@ -357,7 +378,7 @@
 
 <script>
     // =========================================================
-    //  1. 詞庫
+    //  1. 詞庫 (資料保持不變)
     // =========================================================
     const db = {
         "🔤 字母 A-Z": [
@@ -438,82 +459,23 @@
             { rule: "fl", en: "Flower", zh: "花", icon: "🌻", speak: "f-l, Flower" },
             { rule: "st", en: "Star", zh: "星星", icon: "⭐", speak: "s-t, Star" }
         ],
-        // --- 興趣主題 ---
-        "🌍 世界地圖 World": [
-            { en: "Taiwan", zh: "台灣", icon: "🇹🇼", code: "tw" },
-            { en: "USA", zh: "美國", icon: "🇺🇸", code: "us" },
-            { en: "Japan", zh: "日本", icon: "🇯🇵", code: "jp" },
-            { en: "China", zh: "中國", icon: "🇨🇳", code: "cn" },
-            { en: "UK", zh: "英國", icon: "🇬🇧", code: "gb" },
-            { en: "France", zh: "法國", icon: "🇫🇷", code: "fr" },
-            { en: "Germany", zh: "德國", icon: "🇩🇪", code: "de" },
-            { en: "Italy", zh: "義大利", icon: "🇮🇹", code: "it" },
-            { en: "Canada", zh: "加拿大", icon: "🇨🇦", code: "ca" },
-            { en: "Australia", zh: "澳洲", icon: "🇦🇺", code: "au" },
-            { en: "India", zh: "印度", icon: "🇮🇳", code: "in" },
-            { en: "Brazil", zh: "巴西", icon: "🇧🇷", code: "br" },
-            { en: "Egypt", zh: "埃及", icon: "🇪🇬", code: "eg" },
-            { en: "Korea", zh: "韓國", icon: "🇰🇷", code: "kr" },
-            { en: "Russia", zh: "俄羅斯", icon: "🇷🇺", code: "ru" },
-            { en: "Singapore", zh: "新加坡", icon: "🇸🇬", code: "sg" },
-            { en: "Thailand", zh: "泰國", icon: "🇹🇭", code: "th" },
-            { en: "World", zh: "世界", icon: "🌎" }
-        ],
-        "🦖 恐龍 Dinosaurs": [
-            { en: "T-Rex", zh: "暴龍", icon: "🦖" },
-            { en: "Triceratops", zh: "三角龍", icon: "🦕" },
-            { en: "Brachiosaurus", zh: "腕龍", icon: "🦕" },
-            { en: "Stegosaurus", zh: "劍龍", icon: "🦎" },
-            { en: "Pteranodon", zh: "翼龍", icon: "🦅" },
-            { en: "Velociraptor", zh: "迅猛龍", icon: "🦖" },
-            { en: "Dinosaur Egg", zh: "恐龍蛋", icon: "🥚" },
-            { en: "Fossil", zh: "化石", icon: "🦴" },
-            { en: "Volcano", zh: "火山", icon: "🌋" }
-        ],
-        "🪐 宇宙 Space": [
-            { en: "Sun", zh: "太陽", icon: "☀️" },
-            { en: "Moon", zh: "月亮", icon: "🌙" },
-            { en: "Earth", zh: "地球", icon: "🌍" },
-            { en: "Star", zh: "星星", icon: "⭐" },
-            { en: "Rocket", zh: "火箭", icon: "🚀" },
-            { en: "Astronaut", zh: "太空人", icon: "🧑‍🚀" },
-            { en: "Alien", zh: "外星人", icon: "👽" },
-            { en: "UFO", zh: "飛碟", icon: "🛸" },
-            { en: "Planet", zh: "行星", icon: "🪐" },
-            { en: "Mars", zh: "火星", icon: "🔴" }
-        ],
-        "🚒 交通 Vehicles": [
-            { en: "Car", zh: "汽車", icon: "🚗" },
-            { en: "Bus", zh: "公車", icon: "🚌" },
-            { en: "Police Car", zh: "警車", icon: "🚓" },
-            { en: "Fire Truck", zh: "消防車", icon: "🚒" },
-            { en: "Ambulance", zh: "救護車", icon: "🚑" },
-            { en: "Taxi", zh: "計程車", icon: "🚕" },
-            { en: "Truck", zh: "卡車", icon: "🚚" },
-            { en: "Train", zh: "火車", icon: "🚂" },
-            { en: "Airplane", zh: "飛機", icon: "✈️" },
-            { en: "Helicopter", zh: "直升機", icon: "🚁" },
-            { en: "Boat", zh: "船", icon: "🚢" },
-            { en: "Bicycle", zh: "腳踏車", icon: "🚲" },
-            { en: "Motorcycle", zh: "機車", icon: "🛵" },
-            { en: "Scooter", zh: "滑板車", icon: "🛴" },
-            { en: "Excavator", zh: "挖土機", icon: "🏗️" },
-            { en: "Tractor", zh: "拖拉機", icon: "🚜" }
-        ],
-        "🦁 動物園 Zoo": [
+        "🦁 野生動物 Wild": [
             { en: "Lion", zh: "獅子", icon: "🦁" },
             { en: "Tiger", zh: "老虎", icon: "🐯" },
             { en: "Elephant", zh: "大象", icon: "🐘" },
             { en: "Monkey", zh: "猴子", icon: "🐒" },
+            { en: "Gorilla", zh: "大猩猩", icon: "🦍" },
             { en: "Zebra", zh: "斑馬", icon: "🦓" },
             { en: "Giraffe", zh: "長頸鹿", icon: "🦒" },
             { en: "Bear", zh: "熊", icon: "🐻" },
             { en: "Panda", zh: "熊貓", icon: "🐼" },
             { en: "Kangaroo", zh: "袋鼠", icon: "🦘" },
-            { en: "Hippo", zh: "河馬", icon: "🦛" },
+            { en: "Koala", zh: "無尾熊", icon: "🐨" },
             { en: "Crocodile", zh: "鱷魚", icon: "🐊" },
-            { en: "Penguin", zh: "企鵝", icon: "🐧" },
-            { en: "Koala", zh: "無尾熊", icon: "🐨" }
+            { en: "Hippo", zh: "河馬", icon: "🦛" },
+            { en: "Rhino", zh: "犀牛", icon: "🦏" },
+            { en: "Camel", zh: "駱駝", icon: "🐫" },
+            { en: "Sloth", zh: "樹懶", icon: "🦥" }
         ],
         "🐷 農場動物 Farm": [
             { en: "Dog", zh: "狗", icon: "🐶" },
@@ -682,15 +644,49 @@
             { en: "Hot", zh: "熱", icon: "🥵" },
             { en: "Love", zh: "愛", icon: "🥰" }
         ],
-        "👷 職業 Jobs": [
-            { en: "Doctor", zh: "醫生", icon: "👨‍⚕️" },
-            { en: "Police", zh: "警察", icon: "👮" },
-            { en: "Firefighter", zh: "消防員", icon: "🧑‍🚒" },
-            { en: "Teacher", zh: "老師", icon: "👩‍🏫" },
-            { en: "Cook", zh: "廚師", icon: "👨‍🍳" },
-            { en: "Farmer", zh: "農夫", icon: "👨‍🌾" }
+        "🚒 交通 Vehicles": [
+            { en: "Car", zh: "汽車", icon: "🚗" },
+            { en: "Taxi", zh: "計程車", icon: "🚕" },
+            { en: "Bus", zh: "公車", icon: "🚌" },
+            { en: "Police Car", zh: "警車", icon: "🚓" },
+            { en: "Fire Truck", zh: "消防車", icon: "🚒" },
+            { en: "Ambulance", zh: "救護車", icon: "🚑" },
+            { en: "Truck", zh: "卡車", icon: "🚚" },
+            { en: "Train", zh: "火車", icon: "🚂" },
+            { en: "Bullet Train", zh: "高鐵", icon: "🚅" },
+            { en: "Bicycle", zh: "腳踏車", icon: "🚲" },
+            { en: "Motorcycle", zh: "機車", icon: "🛵" },
+            { en: "Airplane", zh: "飛機", icon: "✈️" },
+            { en: "Helicopter", zh: "直升機", icon: "🚁" },
+            { en: "Rocket", zh: "火箭", icon: "🚀" },
+            { en: "Boat", zh: "船", icon: "🚢" },
+            { en: "Tractor", zh: "拖拉機", icon: "🚜" }
         ],
-        // --- 認知基礎 ---
+        "🦖 恐龍 Dinosaurs": [
+            { en: "T-Rex", zh: "暴龍", icon: "🦖" },
+            { en: "Triceratops", zh: "三角龍", icon: "🦕" },
+            { en: "Brachiosaurus", zh: "腕龍", icon: "🦕" },
+            { en: "Stegosaurus", zh: "劍龍", icon: "🦎" },
+            { en: "Pteranodon", zh: "翼龍", icon: "🦅" },
+            { en: "Velociraptor", zh: "迅猛龍", icon: "🦖" },
+            { en: "Dinosaur Egg", zh: "恐龍蛋", icon: "🥚" },
+            { en: "Fossil", zh: "化石", icon: "🦴" },
+            { en: "Volcano", zh: "火山", icon: "🌋" }
+        ],
+        "🌍 世界地圖 World": [
+            { en: "Taiwan", zh: "台灣", icon: "🇹🇼", code: "tw" },
+            { en: "USA", zh: "美國", icon: "🇺🇸", code: "us" },
+            { en: "Japan", zh: "日本", icon: "🇯🇵", code: "jp" },
+            { en: "China", zh: "中國", icon: "🇨🇳", code: "cn" },
+            { en: "UK", zh: "英國", icon: "🇬🇧", code: "gb" },
+            { en: "France", zh: "法國", icon: "🇫🇷", code: "fr" },
+            { en: "Germany", zh: "德國", icon: "🇩🇪", code: "de" },
+            { en: "Italy", zh: "義大利", icon: "🇮🇹", code: "it" },
+            { en: "Canada", zh: "加拿大", icon: "🇨🇦", code: "ca" },
+            { en: "Australia", zh: "澳洲", icon: "🇦🇺", code: "au" },
+            { en: "Korea", zh: "韓國", icon: "🇰🇷", code: "kr" },
+            { en: "World", zh: "世界", icon: "🌎" }
+        ],
         "🔢 數字 Numbers": [
             { en: "One", zh: "1", speak: "One", icon: "1️⃣" },
             { en: "Two", zh: "2", speak: "Two", icon: "2️⃣" },
@@ -714,40 +710,13 @@
             { en: "Black", zh: "黑色", icon: "⬛" },
             { en: "White", zh: "白色", icon: "⬜" }
         ],
-        "🔷 形狀 Shapes": [
-            { en: "Circle", zh: "圓形", icon: "🔴" },
-            { en: "Square", zh: "正方形", icon: "🟥" },
-            { en: "Triangle", zh: "三角形", icon: "🔺" },
-            { en: "Star", zh: "星星", icon: "⭐" },
-            { en: "Heart", zh: "愛心", icon: "❤️" }
-        ],
-        // --- 生活場景 ---
-        "👀 身體 Body": [
-            { en: "Head", zh: "頭", icon: "👦" },
-            { en: "Eye", zh: "眼睛", icon: "👁️" },
-            { en: "Nose", zh: "鼻子", icon: "👃" },
-            { en: "Mouth", zh: "嘴巴", icon: "👄" },
-            { en: "Ear", zh: "耳朵", icon: "👂" },
-            { en: "Hand", zh: "手", icon: "✋" },
-            { en: "Arm", zh: "手臂", icon: "💪" },
-            { en: "Leg", zh: "腿", icon: "🦵" },
-            { en: "Foot", zh: "腳", icon: "🦶" }
-        ],
-        "🛋️ 客廳 Living": [
-            { en: "Sofa", zh: "沙發", icon: "🛋️" },
-            { en: "TV", zh: "電視", icon: "📺" },
-            { en: "Table", zh: "桌子", icon: "🟫" },
-            { en: "Chair", zh: "椅子", icon: "🪑" },
-            { en: "Lamp", zh: "燈", icon: "💡" },
-            { en: "Fan", zh: "風扇", icon: "🌬️" }
-        ],
-        "🍳 廚房 Kitchen": [
-            { en: "Fridge", zh: "冰箱", icon: "❄️" },
-            { en: "Oven", zh: "烤箱", icon: "🥐" },
-            { en: "Pan", zh: "平底鍋", icon: "🍳" },
-            { en: "Pot", zh: "鍋子", icon: "🍲" },
-            { en: "Cup", zh: "杯子", icon: "🥤" },
-            { en: "Spoon", zh: "湯匙", icon: "🥄" }
+        "👷 職業 Jobs": [
+            { en: "Doctor", zh: "醫生", icon: "👨‍⚕️" },
+            { en: "Police", zh: "警察", icon: "👮" },
+            { en: "Firefighter", zh: "消防員", icon: "🧑‍🚒" },
+            { en: "Teacher", zh: "老師", icon: "👩‍🏫" },
+            { en: "Cook", zh: "廚師", icon: "👨‍🍳" },
+            { en: "Farmer", zh: "農夫", icon: "👨‍🌾" }
         ]
     };
 
@@ -763,21 +732,16 @@
     let focusIndex = 0;
     let activeItems = []; 
     
-    // 錄音相關
+    // 錄音相關 (全域變數)
     let mediaRecorder = null; 
-    let globalStream = null; 
-    const playbackAudio = new Audio(); 
+    const playbackAudio = new Audio(); // 共用播放器
 
     // 最愛
     let favorites = JSON.parse(localStorage.getItem('eliza_favs')) || [];
 
-    let displayMode = 0;
-    const modeConfigs = [
-        { text: "📖 顯示：中+英", showEn: true, showZh: true },
-        { text: "🔤 顯示：英文", showEn: true, showZh: false },
-        { text: "🈷️ 顯示：中文", showEn: false, showZh: true },
-        { text: "🖼️ 顯示：只有圖", showEn: false, showZh: false }
-    ];
+    // 顯示設定 (獨立開關)
+    let showZh = true;
+    let showEn = true;
 
     function init() {
         renderNav();
@@ -872,7 +836,7 @@
         }
     }
 
-    // --- Favorites Logic (Enhanced UX) ---
+    // --- Favorites Logic ---
     function toggleFavorite(event) {
         event.stopPropagation();
         if(activeItems.length === 0) return;
@@ -887,21 +851,26 @@
         }
         
         localStorage.setItem('eliza_favs', JSON.stringify(favorites));
-        
-        // 只更新 UI 狀態，不重新載入房間，避免專注模式跳掉
         renderFocusCard(); 
         
-        // 注意：如果在最愛房間，清單會在下次重整或切換視圖時更新
+        // UX 改進：如果是在最愛清單，不要立刻移除，等下次進來再移除
     }
 
-    function cycleMode() {
-        displayMode = (displayMode + 1) % 4;
-        updateModeUI();
+    // --- Toggle Functions ---
+    function toggleZh() {
+        showZh = !showZh;
+        const btn = document.getElementById('btnZh');
+        if(showZh) btn.classList.add('active');
+        else btn.classList.remove('active');
+        renderGrid();
+        if(isFocusMode) renderFocusCard();
     }
 
-    function updateModeUI() {
-        const config = modeConfigs[displayMode];
-        document.getElementById('btnMode').innerText = config.text;
+    function toggleEn() {
+        showEn = !showEn;
+        const btn = document.getElementById('btnEn');
+        if(showEn) btn.classList.add('active');
+        else btn.classList.remove('active');
         renderGrid();
         if(isFocusMode) renderFocusCard();
     }
@@ -910,12 +879,10 @@
         const grid = document.getElementById('cardGrid');
         grid.innerHTML = '';
         
-        const config = modeConfigs[displayMode];
-
         grid.classList.remove('hide-zh', 'hide-en', 'hide-text');
-        if (!config.showZh) grid.classList.add('hide-zh');
-        if (!config.showEn) grid.classList.add('hide-en');
-        if (!config.showZh && !config.showEn) grid.classList.add('hide-text'); 
+        if (!showZh) grid.classList.add('hide-zh');
+        if (!showEn) grid.classList.add('hide-en');
+        if (!showZh && !showEn) grid.classList.add('hide-text'); 
 
         activeItems.forEach((item, index) => {
             const card = document.createElement('div');
@@ -957,7 +924,19 @@
         }
     }
 
-    // --- Audio Logic (iOS Fix: New Stream Every Time) ---
+    // --- Audio Stream Helper (Fresh Stream for iOS) ---
+    async function getFreshStream() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            return stream;
+        } catch (err) {
+            console.error(err);
+            alert("請允許麥克風權限以使用錄音功能 (需 HTTPS)");
+            return null;
+        }
+    }
+
+    // --- Record Logic (Fixed for iPad) ---
     async function toggleRecord(event, btn) {
         event.stopPropagation(); 
 
@@ -968,14 +947,9 @@
         playbackAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAgAAAA==';
         playbackAudio.play().catch(() => {});
 
-        // 2. Request Fresh Stream (Crucial for iOS to prevent cut-off)
-        let stream = null;
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        } catch (err) {
-            alert("無法錄音，請檢查權限或 HTTPS。");
-            return;
-        }
+        // 2. Request Fresh Stream Every Time
+        const stream = await getFreshStream();
+        if(!stream) return;
 
         try {
             let options = {};
@@ -999,7 +973,7 @@
                 
                 container.classList.remove('recording');
                 
-                // Stop tracks to release hardware
+                // IMPORTANT: Stop all tracks to release mic on iPad
                 stream.getTracks().forEach(track => track.stop());
             };
 
@@ -1076,14 +1050,19 @@
         const btn = document.getElementById('btnFocus');
         if(isFocusMode) {
             overlay.style.display = 'flex';
-            btn.classList.add('active');
+            // btn.classList.add('active'); // Removed: Button is focus trigger
             focusIndex = 0;
             renderFocusCard();
         } else {
             overlay.style.display = 'none';
-            btn.classList.remove('active');
+            // btn.classList.remove('active');
             if (mediaRecorder && mediaRecorder.state === "recording") {
                 mediaRecorder.stop();
+            }
+            
+            // If returning from Favorites, reload to reflect removals
+            if(currentRoom === 'favorites') {
+                loadRoom('favorites');
             }
         }
     }
@@ -1110,7 +1089,6 @@
         const bgLayer = document.getElementById('focusBg');
         const micContainer = document.getElementById('focusMicContainer');
         const favBtn = document.getElementById('btnFav');
-        const config = modeConfigs[displayMode];
         
         let bgColor = item.rule ? stringToPastelColor(item.rule) : stringToColor(item.en);
         bgLayer.style.background = item.rule ? bgColor : `#${bgColor}`;
@@ -1133,8 +1111,8 @@
             visual = `<img src="https://flagcdn.com/h240/${item.code}.png" class="focus-flag-img">`;
         }
 
-        let enStyle = config.showEn ? '' : 'opacity:0';
-        let zhStyle = config.showZh ? '' : 'opacity:0';
+        let enStyle = showEn ? '' : 'opacity:0';
+        let zhStyle = showZh ? '' : 'opacity:0';
 
         container.innerHTML = `
             ${visual}
@@ -1259,17 +1237,14 @@
 
     function toggleQuiz() {
         isQuiz = !isQuiz;
-        const area = document.getElementById('quizArea');
-        const btn = document.querySelector('.btn-quiz');
+        const btn = document.getElementById('btnQuiz');
         if (isQuiz) {
-            area.style.display = 'block';
-            btn.innerText = "📚 回到學習";
-            btn.style.background = "#FF6B6B";
+            btn.classList.add('active');
+            document.getElementById('quizArea').style.display = 'block';
             nextQuestion();
         } else {
-            area.style.display = 'none';
-            btn.innerText = "🎮 測驗";
-            btn.style.background = "var(--primary)";
+            btn.classList.remove('active');
+            document.getElementById('quizArea').style.display = 'none';
         }
         if(isFocusMode) renderFocusCard();
     }

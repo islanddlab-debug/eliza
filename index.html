@@ -24,14 +24,13 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body { 
-            /* 使用 Fredoka 圓體字，若無則退回微軟正黑體 */
             font-family: 'Fredoka', 'Microsoft JhengHei', sans-serif; 
             background: var(--bg); 
             margin: 0; 
             padding-bottom: 80px; 
             color: var(--text-main);
             overflow-x: hidden;
-            font-size: 17px; /* 整體字體稍微加大 */
+            font-size: 18px; /* 全局字體再稍微加大一點點 */
         }
         
         /* --- Header --- */
@@ -53,20 +52,16 @@
             gap: 15px; margin-bottom: 10px;
         }
         
-        /* 標題樣式優化：更大、更可愛 */
         h1 { 
-            margin: 0; 
-            color: var(--primary); 
-            font-size: 1.8rem; /* 字體加大 */
-            font-weight: 600;
+            margin: 0; color: var(--primary); 
+            font-size: 1.8rem; font-weight: 600;
             display: flex; align-items: center; gap: 8px; 
-            white-space: nowrap; 
-            letter-spacing: 0.5px;
+            white-space: nowrap; letter-spacing: 0.5px;
         }
 
         .search-box { flex-grow: 1; position: relative; max-width: 400px; }
         .search-input {
-            width: 100%; padding: 12px 18px; border-radius: 25px; /* 輸入框也加大一點 */
+            width: 100%; padding: 12px 18px; border-radius: 25px;
             border: 2px solid #eee; font-size: 1rem; outline: none;
             transition: 0.3s; background: #f9f9f9; appearance: none;
             font-family: 'Fredoka', sans-serif;
@@ -121,14 +116,20 @@
         @keyframes bounceIn { 0% {transform: scale(0.8); opacity:0;} 70% {transform: scale(1.05);} 100% {transform: scale(1); opacity:1;} }
         #quizQuestion { font-size: 1.5rem; font-weight: 600; color: #444; }
 
+        /* --- Grid 優化：針對 iPad/電腦 放大卡片 --- */
         .grid {
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
-            gap: 18px; padding-bottom: 40px;
+            /* 這裡改成 180px，讓大螢幕的卡片變寬，字才塞得下 */
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+            gap: 20px; padding-bottom: 40px;
         }
         
+        /* 手機版 (小螢幕) 保持一排兩個 */
         @media (max-width: 480px) {
-            .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .grid { 
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 12px; 
+            }
             .top-row { flex-direction: column; align-items: stretch; }
             .search-box { max-width: 100%; }
             h1 { justify-content: center; font-size: 1.6rem; margin-bottom: 5px; }
@@ -152,15 +153,16 @@
 
         .card-img {
             flex-grow: 1; display: flex; align-items: center; justify-content: center;
-            font-size: 3.8rem; background: linear-gradient(180deg, #fafafa 0%, #fff 100%);
+            font-size: 4.5rem; /* Emoji 放大 */
+            background: linear-gradient(180deg, #fafafa 0%, #fff 100%);
             width: 100%; transition: background 0.3s;
         }
-        .card-body { padding: 10px 5px; border-top: 1px solid rgba(0,0,0,0.05); background: #fff; }
+        .card-body { padding: 12px 5px; border-top: 1px solid rgba(0,0,0,0.05); background: #fff; }
         
-        .en-word { font-size: 1.3rem; font-weight: 600; color: #333; display: block; margin-bottom: 2px; transition: opacity 0.3s; }
-        .zh-word { font-size: 1rem; color: #888; font-weight: 500; transition: opacity 0.3s; font-family: 'Microsoft JhengHei', sans-serif; } /* 中文維持正黑體比較好讀 */
+        .en-word { font-size: 1.4rem; font-weight: 600; color: #333; display: block; margin-bottom: 2px; transition: opacity 0.3s; }
+        .zh-word { font-size: 1.1rem; color: #888; font-weight: 500; transition: opacity 0.3s; font-family: 'Microsoft JhengHei', sans-serif; }
 
-        .phonics-card .en-word { font-size: 1.5rem; color: #333; } 
+        .phonics-card .en-word { font-size: 1.6rem; color: #333; } 
         .flag-card .card-img img { width: 100%; height: 100%; object-fit: cover; }
         
         .hide-zh .zh-word { opacity: 0; }

@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Eliza's English Playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- 核心變數 --- */
+        :root {
+            --primary: #FF9F1C;
+            --secondary: #2EC4B6;
+            --accent: #FFBF69;
+            --phonics: #FF99C8;
+            --bg: #F4F7F6;
+            --card-bg: #FFFFFF;
+            --text-main: #2D3436;
+            --side-gap: 20px;
+        }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body { 
+            /* 使用 Fredoka 圓體字，若無則退回微軟正黑體 */
+            font-family: 'Fredoka', 'Microsoft JhengHei', sans-serif; 
+            background: var(--bg); 
+            margin: 0; 
+            padding-bottom: 80px; 
+            color: var(--text-main);
+            overflow-x: hidden;
+            font-size: 17px; /* 整體字體稍微加大 */
+        }
+        
+        /* --- Header --- */
+        .header-area {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(255,255,255,0.98);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            backdrop-filter: blur(10px);
+            width: 100%;
+        }
+
+        .header-inner {
+            max-width: 1200px; margin: 0 auto;
+            padding: 10px var(--side-gap) 0 var(--side-gap);
+        }
+
+        .top-row {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 15px; margin-bottom: 10px;
+        }
+        
+        /* 標題樣式優化：更大、更可愛 */
+        h1 { 
+            margin: 0; 
+            color: var(--primary); 
+            font-size: 1.8rem; /* 字體加大 */
+            font-weight: 600;
+            display: flex; align-items: center; gap: 8px; 
+            white-space: nowrap; 
+            letter-spacing: 0.5px;
+        }
+
+        .search-box { flex-grow: 1; position: relative; max-width: 400px; }
+        .search-input {
+            width: 100%; padding: 12px 18px; border-radius: 25px; /* 輸入框也加大一點 */
+            border: 2px solid #eee; font-size: 1rem; outline: none;
+            transition: 0.3s; background: #f9f9f9; appearance: none;
+            font-family: 'Fredoka', sans-serif;
+        }
+        .search-input:focus { border-color: var(--secondary); background: white; }
+
+        .tools-row {
+            display: flex; gap: 10px; overflow-x: auto; align-items: center;
+            padding-bottom: 10px; scrollbar-width: none;
+        }
+        .tools-row::-webkit-scrollbar { display: none; }
+
+        .tool-btn {
+            background: #fff; border: 2px solid #eee; color: #555;
+            padding: 10px 18px; border-radius: 25px; cursor: pointer;
+            font-size: 0.95rem; display: flex; align-items: center; gap: 6px;
+            white-space: nowrap; font-weight: 600; transition: 0.2s; flex-shrink: 0;
+            font-family: 'Fredoka', sans-serif;
+        }
+        .tool-btn:active { transform: scale(0.95); background: #f0f0f0; }
+        
+        #btnMode { background: #E3F2FD; color: #1565C0; border-color: #BBDEFB; }
+        .btn-quiz { background: var(--primary); color: white; border: none; }
+
+        .nav-scroller { 
+            overflow-x: auto; white-space: nowrap; 
+            padding: 5px var(--side-gap) 15px var(--side-gap);
+            -webkit-overflow-scrolling: touch; scrollbar-width: none;
+            margin-left: calc(var(--side-gap) * -1); margin-right: calc(var(--side-gap) * -1);
+            padding-left: var(--side-gap);
+        }
+        .nav-scroller::-webkit-scrollbar { display: none; }
+        
+        .room-tab {
+            display: inline-block; padding: 10px 20px; margin-right: 8px;
+            background: white; border-radius: 25px; cursor: pointer;
+            border: 2px solid #eee; color: #666; font-weight: 600; font-size: 1rem;
+            transition: all 0.2s; font-family: 'Fredoka', sans-serif;
+        }
+        .room-tab.active { background: var(--secondary); color: white; border-color: var(--secondary); transform: scale(1.05); }
+        .room-tab.phonics-tab { border-color: var(--phonics); color: var(--phonics); }
+        .room-tab.phonics-tab.active { background: var(--phonics); color: white; border-color: var(--phonics); }
+
+        /* --- Content --- */
+        .main-container { max-width: 1200px; margin: 0 auto; padding: 0 var(--side-gap); }
+
+        #quizArea {
+            display: none; background: var(--accent); padding: 15px;
+            text-align: center; margin: 15px 0; border-radius: 15px;
+            box-shadow: 0 4px 0 #e5ac5e; animation: bounceIn 0.5s;
+        }
+        @keyframes bounceIn { 0% {transform: scale(0.8); opacity:0;} 70% {transform: scale(1.05);} 100% {transform: scale(1); opacity:1;} }
+        #quizQuestion { font-size: 1.5rem; font-weight: 600; color: #444; }
+
+        .grid {
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+            gap: 18px; padding-bottom: 40px;
+        }
+        
+        @media (max-width: 480px) {
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .top-row { flex-direction: column; align-items: stretch; }
+            .search-box { max-width: 100%; }
+            h1 { justify-content: center; font-size: 1.6rem; margin-bottom: 5px; }
+        }
+
+        /* --- Card Styles --- */
+        .card {
+            background: var(--card-bg); border-radius: 20px; text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer;
+            transition: transform 0.2s; border: 3px solid transparent;
+            position: relative; overflow: hidden; user-select: none;
+            aspect-ratio: 1 / 1.15; display: flex; flex-direction: column;
+        }
+        .card:active { transform: scale(0.98); }
+        
+        .rule-tag {
+            font-size: 0.85rem; font-weight: 600; padding: 5px 0;
+            color: #fff; background: rgba(0,0,0,0.1); width: 100%;
+            letter-spacing: 1px;
+        }
+
+        .card-img {
+            flex-grow: 1; display: flex; align-items: center; justify-content: center;
+            font-size: 3.8rem; background: linear-gradient(180deg, #fafafa 0%, #fff 100%);
+            width: 100%; transition: background 0.3s;
+        }
+        .card-body { padding: 10px 5px; border-top: 1px solid rgba(0,0,0,0.05); background: #fff; }
+        
+        .en-word { font-size: 1.3rem; font-weight: 600; color: #333; display: block; margin-bottom: 2px; transition: opacity 0.3s; }
+        .zh-word { font-size: 1rem; color: #888; font-weight: 500; transition: opacity 0.3s; font-family: 'Microsoft JhengHei', sans-serif; } /* 中文維持正黑體比較好讀 */
+
+        .phonics-card .en-word { font-size: 1.5rem; color: #333; } 
+        .flag-card .card-img img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .hide-zh .zh-word { opacity: 0; }
+        .hide-en .en-word { opacity: 0; }
+        
+        .card.correct { border-color: #4CAF50; transform: scale(1.05) !important; z-index: 10; box-shadow: 0 0 15px #4CAF50; }
+        .card.wrong { border-color: #F44336; opacity: 0.6; animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+
+        /* --- Focus Mode & Modal --- */
+        #focusOverlay, .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(244, 247, 246, 0.95); z-index: 500; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .modal-overlay { background: rgba(0,0,0,0.85); z-index: 999; }
+
+        .focus-card {
+            background: white; width: 85%; max-width: 400px; aspect-ratio: 3/4;
+            border-radius: 35px; box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; border: 8px solid white; transition: 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .focus-card-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.1; }
+        .focus-content-layer { z-index: 1; text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center; }
+
+        .focus-rule { font-size: 1.6rem; color: #888; margin-bottom: 10px; font-weight: bold; letter-spacing: 2px; }
+        .focus-icon { font-size: 8rem; margin-bottom: 15px; }
+        .focus-en { font-size: 3.2rem; font-weight: 600; color: var(--text-main); margin-bottom: 5px; line-height: 1.1; transition: opacity 0.3s; }
+        .focus-zh { font-size: 1.6rem; color: #666; margin-bottom: 20px; transition: opacity 0.3s; }
+        .focus-flag-img { width: 90%; height: auto; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        .focus-mic-container {
+            position: relative; width: 70px; height: 70px;
+            display: flex; align-items: center; justify-content: center;
+            margin-top: 10px;
+        }
+        .focus-mic-btn {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: white; border: 2px solid #f0f0f0; color: var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-size: 1.8rem; cursor: pointer; z-index: 2;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .focus-mic-btn:active { transform: scale(0.95); background: #f9f9f9; }
+
+        .focus-progress-ring {
+            position: absolute; top: 0; left: 0;
+            width: 70px; height: 70px; transform: rotate(-90deg);
+            z-index: 1; pointer-events: none;
+        }
+        .focus-progress-ring__circle {
+            stroke-dasharray: 201; stroke-dashoffset: 201; transition: stroke-dashoffset 0s;
+        }
+        
+        .recording .focus-mic-btn { background: #FF5252; color: white; border-color: #FF5252; animation: pulse-red 1s infinite; }
+        .recording .focus-progress-ring__circle { stroke-dashoffset: 0; transition: stroke-dashoffset 2s linear; }
+        @keyframes pulse-red { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        .focus-nav-btn {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: white; border: none; width: 50px; height: 50px;
+            border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-size: 1.5rem; color: var(--secondary); cursor: pointer; z-index: 501;
+        }
+        .prev-btn { left: 15px; } .next-btn { right: 15px; }
+        @media (max-width: 480px) {
+            .focus-nav-btn { top: 88%; background: rgba(255,255,255,0.9); }
+            .prev-btn { left: 15%; } .next-btn { right: 15%; }
+        }
+        .close-circle-btn {
+            position: absolute; top: 20px; right: 20px;
+            width: 40px; height: 40px; border-radius: 50%; background: #eee;
+            border: none; font-weight: bold; cursor: pointer; color: #555; z-index: 502;
+        }
+
+        /* Modal */
+        .modal-content {
+            background: white; padding: 20px; border-radius: 25px;
+            text-align: center; width: 90%; max-width: 500px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4); animation: popIn 0.3s ease;
+        }
+        @keyframes popIn { from {transform: scale(0.9); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+        
+        .modal-img-container {
+            width: 100%; height: 300px; background: #f0f0f0;
+            border-radius: 15px; margin-bottom: 15px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center; position: relative;
+        }
+        .modal-img { width: 100%; height: 100%; object-fit: contain; display: none; background: #fff; }
+        .modal-loading { font-size: 1.1rem; color: #888; font-weight: bold; }
+        .modal-word { font-size: 2rem; color: var(--primary); font-weight: 800; display: block; margin-bottom: 5px; }
+        .modal-zh { font-size: 1.2rem; color: #666; margin-bottom: 15px; display: block; }
+        
+        .source-tag { position: absolute; bottom: 8px; right: 8px; font-size: 0.7rem; background: rgba(0,0,0,0.6); color: white; padding: 3px 8px; border-radius: 6px; }
+        .btn-full { width: 100%; padding: 12px; border-radius: 30px; font-weight: bold; margin-top: 10px; cursor: pointer; border: none; font-family: 'Fredoka', sans-serif; }
+        .btn-gray { background: #f0f0f0; color: #555; }
+        .btn-primary { background: var(--primary); color: white; }
+
+        .count-badge { font-size: 0.7rem; background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 10px; margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="modal-overlay" id="imgModal" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-img-container">
+            <div class="modal-loading" id="modalLoader">📡 搜尋中...</div>
+            <img src="" alt="Learning Image" class="modal-img" id="realImage" onerror="handleFallback()">
+            <span class="source-tag" id="imgSource">Wiki</span>
+        </div>
+        <span class="modal-word" id="modalEn">Word</span>
+        <span class="modal-zh" id="modalZh">中文</span>
+        <button class="btn-full btn-gray" onclick="forceRandomReload()">🔄 圖片不準？換一張</button>
+        <button class="btn-full btn-primary" onclick="closeModal()">關閉</button>
+    </div>
+</div>
+
+<div id="focusOverlay">
+    <button class="close-circle-btn" onclick="toggleFocusMode()">✕</button>
+    <button class="focus-nav-btn prev-btn" onclick="focusNav(-1)">❮</button>
+    <button class="focus-nav-btn next-btn" onclick="focusNav(1)">❯</button>
+    <div class="focus-card" id="focusCard" onclick="handleFocusClick()">
+        <div class="focus-card-bg" id="focusBg"></div>
+        <div class="focus-content-layer">
+            <div class="focus-rule" id="focusRule"></div>
+            <div id="focusContent"></div> 
+            
+            <div class="focus-mic-container" id="focusMicContainer">
+                <svg class="focus-progress-ring" width="70" height="70">
+                   <circle class="focus-progress-ring__circle" stroke="#FF5252" stroke-width="4" fill="transparent" r="32" cx="35" cy="35"/>
+                </svg>
+                <button class="focus-mic-btn" onclick="toggleRecord(event, this)">🎤</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="header-area">
+    <div class="header-inner">
+        <div class="top-row">
+            <h1>🦁 Eliza's English Playground</h1>
+            <div class="search-box">
+                <input type="search" class="search-input" id="searchInput" placeholder="🔍 搜尋單字..." oninput="handleSearch()">
+            </div>
+        </div>
+        
+        <div class="tools-row">
+            <button class="tool-btn btn-quiz" onclick="toggleQuiz()">🎮 測驗</button>
+            <button class="tool-btn" id="btnMode" onclick="cycleMode()">📖 顯示：中+英</button>
+            <button class="tool-btn" id="btnFocus" onclick="toggleFocusMode()">🔲 專注模式</button>
+        </div>
+
+        <div class="nav-scroller" id="navBar"></div>
+    </div>
+</div>
+
+<div class="main-container">
+    <div id="quizArea">
+        <div id="quizQuestion">🔊 聽聲音找找看！</div>
+    </div>
+    <div class="grid" id="cardGrid"></div>
+</div>
+
+<script>
+    // =========================================================
+    //  1. 詞庫
+    // =========================================================
+    const db = {
+        "🔤 字母 A-Z": [
+            { rule: "A", en: "Apple", zh: "蘋果", icon: "🍎", speak: "A, Apple" },
+            { rule: "A", en: "Ant", zh: "螞蟻", icon: "🐜", speak: "A, Ant" },
+            { rule: "B", en: "Bear", zh: "熊", icon: "🐻", speak: "B, Bear" },
+            { rule: "B", en: "Ball", zh: "球", icon: "⚽", speak: "B, Ball" },
+            { rule: "C", en: "Cat", zh: "貓", icon: "🐱", speak: "C, Cat" },
+            { rule: "C", en: "Car", zh: "車", icon: "🚗", speak: "C, Car" },
+            { rule: "D", en: "Dog", zh: "狗", icon: "🐶", speak: "D, Dog" },
+            { rule: "E", en: "Elephant", zh: "大象", icon: "🐘", speak: "E, Elephant" },
+            { rule: "E", en: "Egg", zh: "蛋", icon: "🥚", speak: "E, Egg" },
+            { rule: "F", en: "Frog", zh: "青蛙", icon: "🐸", speak: "F, Frog" },
+            { rule: "F", en: "Fish", zh: "魚", icon: "🐟", speak: "F, Fish" },
+            { rule: "G", en: "Goat", zh: "山羊", icon: "🐐", speak: "G, Goat" },
+            { rule: "H", en: "Hat", zh: "帽子", icon: "👒", speak: "H, Hat" },
+            { rule: "I", en: "Igloo", zh: "冰屋", icon: "🛖", speak: "I, Igloo" },
+            { rule: "J", en: "Jet", zh: "噴射機", icon: "✈️", speak: "J, Jet" },
+            { rule: "K", en: "Kite", zh: "風箏", icon: "🪁", speak: "K, Kite" },
+            { rule: "L", en: "Lion", zh: "獅子", icon: "🦁", speak: "L, Lion" },
+            { rule: "M", en: "Monkey", zh: "猴子", icon: "🐒", speak: "M, Monkey" },
+            { rule: "N", en: "Nest", zh: "鳥巢", icon: "🪺", speak: "N, Nest" },
+            { rule: "O", en: "Octopus", zh: "章魚", icon: "🐙", speak: "O, Octopus" },
+            { rule: "P", en: "Pig", zh: "豬", icon: "🐷", speak: "P, Pig" },
+            { rule: "Q", en: "Queen", zh: "女王", icon: "👸", speak: "Q, Queen" },
+            { rule: "R", en: "Rabbit", zh: "兔子", icon: "🐰", speak: "R, Rabbit" },
+            { rule: "S", en: "Sun", zh: "太陽", icon: "☀️", speak: "S, Sun" },
+            { rule: "T", en: "Tiger", zh: "老虎", icon: "🐯", speak: "T, Tiger" },
+            { rule: "U", en: "Umbrella", zh: "雨傘", icon: "☔", speak: "U, Umbrella" },
+            { rule: "V", en: "Van", zh: "廂型車", icon: "🚐", speak: "V, Van" },
+            { rule: "W", en: "Wolf", zh: "狼", icon: "🐺", speak: "W, Wolf" },
+            { rule: "X", en: "Box", zh: "箱子", icon: "📦", speak: "X, Box" },
+            { rule: "Y", en: "Yo-yo", zh: "溜溜球", icon: "🪀", speak: "Y, Yo-yo" },
+            { rule: "Z", en: "Zebra", zh: "斑馬", icon: "🦓", speak: "Z, Zebra" }
+        ],
+        "🔤 短母音 Short Vowels": [
+            { rule: "Short a", en: "Cat", zh: "貓", icon: "🐱", speak: "Short a, Cat" },
+            { rule: "Short a", en: "Hat", zh: "帽子", icon: "👒", speak: "Short a, Hat" },
+            { rule: "Short a", en: "Map", zh: "地圖", icon: "🗺️", speak: "Short a, Map" },
+            { rule: "Short a", en: "Dad", zh: "爸爸", icon: "👨", speak: "Short a, Dad" },
+            { rule: "Short e", en: "Hen", zh: "母雞", icon: "🐔", speak: "Short e, Hen" },
+            { rule: "Short e", en: "Pen", zh: "筆", icon: "🖊️", speak: "Short e, Pen" },
+            { rule: "Short e", en: "Bed", zh: "床", icon: "🛏️", speak: "Short e, Bed" },
+            { rule: "Short i", en: "Pig", zh: "豬", icon: "🐷", speak: "Short i, Pig" },
+            { rule: "Short i", en: "Wig", zh: "假髮", icon: "🦳", speak: "Short i, Wig" },
+            { rule: "Short i", en: "Bin", zh: "桶子", icon: "🗑️", speak: "Short i, Bin" },
+            { rule: "Short o", en: "Dog", zh: "狗", icon: "🐶", speak: "Short o, Dog" },
+            { rule: "Short o", en: "Fox", zh: "狐狸", icon: "🦊", speak: "Short o, Fox" },
+            { rule: "Short o", en: "Box", zh: "箱子", icon: "📦", speak: "Short o, Box" },
+            { rule: "Short u", en: "Bus", zh: "公車", icon: "🚌", speak: "Short u, Bus" },
+            { rule: "Short u", en: "Bug", zh: "蟲", icon: "🪲", speak: "Short u, Bug" },
+            { rule: "Short u", en: "Cup", zh: "杯子", icon: "☕", speak: "Short u, Cup" }
+        ],
+        "🔤 長母音 Long Vowels": [
+            { rule: "a_e", en: "Cake", zh: "蛋糕", icon: "🎂", speak: "Long a, Cake" },
+            { rule: "a_e", en: "Snake", zh: "蛇", icon: "🐍", speak: "Long a, Snake" },
+            { rule: "a_e", en: "Grape", zh: "葡萄", icon: "🍇", speak: "Long a, Grape" },
+            { rule: "ee", en: "Tree", zh: "樹", icon: "🌳", speak: "Long e, Tree" },
+            { rule: "ee", en: "Bee", zh: "蜜蜂", icon: "🐝", speak: "Long e, Bee" },
+            { rule: "ee", en: "Sheep", zh: "綿羊", icon: "🐑", speak: "Long e, Sheep" },
+            { rule: "i_e", en: "Kite", zh: "風箏", icon: "🪁", speak: "Long i, Kite" },
+            { rule: "i_e", en: "Bike", zh: "腳踏車", icon: "🚲", speak: "Long i, Bike" },
+            { rule: "i_e", en: "Five", zh: "五", icon: "5️⃣", speak: "Long i, Five" },
+            { rule: "o_e", en: "Bone", zh: "骨頭", icon: "🦴", speak: "Long o, Bone" },
+            { rule: "o_e", en: "Rose", zh: "玫瑰", icon: "🌹", speak: "Long o, Rose" },
+            { rule: "o_e", en: "Phone", zh: "電話", icon: "📱", speak: "Long o, Phone" },
+            { rule: "u_e", en: "Cube", zh: "方塊", icon: "🧊", speak: "Long u, Cube" },
+            { rule: "u_e", en: "Cute", zh: "可愛", icon: "🥺", speak: "Long u, Cute" }
+        ],
+        "🔤 雙字母/混合音": [
+            { rule: "sh", en: "Ship", zh: "船", icon: "🚢", speak: "S-H, Ship" },
+            { rule: "sh", en: "Fish", zh: "魚", icon: "🐟", speak: "S-H, Fish" },
+            { rule: "ch", en: "Chair", zh: "椅子", icon: "🪑", speak: "C-H, Chair" },
+            { rule: "ch", en: "Cheese", zh: "起司", icon: "🧀", speak: "C-H, Cheese" },
+            { rule: "th", en: "Thumb", zh: "大拇指", icon: "👍", speak: "T-H, Thumb" },
+            { rule: "wh", en: "Whale", zh: "鯨魚", icon: "🐋", speak: "W-H, Whale" },
+            { rule: "bl", en: "Blue", zh: "藍色", icon: "🔵", speak: "b-l, Blue" },
+            { rule: "fl", en: "Flower", zh: "花", icon: "🌻", speak: "f-l, Flower" },
+            { rule: "st", en: "Star", zh: "星星", icon: "⭐", speak: "s-t, Star" }
+        ],
+        "🦁 野生動物 Wild": [
+            { en: "Lion", zh: "獅子", icon: "🦁" },
+            { en: "Tiger", zh: "老虎", icon: "🐯" },
+            { en: "Elephant", zh: "大象", icon: "🐘" },
+            { en: "Monkey", zh: "猴子", icon: "🐒" },
+            { en: "Gorilla", zh: "大猩猩", icon: "🦍" },
+            { en: "Zebra", zh: "斑馬", icon: "🦓" },
+            { en: "Giraffe", zh: "長頸鹿", icon: "🦒" },
+            { en: "Bear", zh: "熊", icon: "🐻" },
+            { en: "Panda", zh: "熊貓", icon: "🐼" },
+            { en: "Kangaroo", zh: "袋鼠", icon: "🦘" },
+            { en: "Koala", zh: "無尾熊", icon: "🐨" },
+            { en: "Crocodile", zh: "鱷魚", icon: "🐊" },
+            { en: "Hippo", zh: "河馬", icon: "🦛" },
+            { en: "Rhino", zh: "犀牛", icon: "🦏" },
+            { en: "Camel", zh: "駱駝", icon: "🐫" },
+            { en: "Sloth", zh: "樹懶", icon: "🦥" }
+        ],
+        "🐷 農場動物 Farm": [
+            { en: "Dog", zh: "狗", icon: "🐶" },
+            { en: "Cat", zh: "貓", icon: "🐱" },
+            { en: "Pig", zh: "豬", icon: "🐷" },
+            { en: "Cow", zh: "牛", icon: "🐄" },
+            { en: "Sheep", zh: "綿羊", icon: "🐑" },
+            { en: "Goat", zh: "山羊", icon: "🐐" },
+            { en: "Horse", zh: "馬", icon: "🐎" },
+            { en: "Chicken", zh: "雞", icon: "🐔" },
+            { en: "Rooster", zh: "公雞", icon: "🐓" },
+            { en: "Duck", zh: "鴨子", icon: "🦆" },
+            { en: "Rabbit", zh: "兔子", icon: "🐰" },
+            { en: "Mouse", zh: "老鼠", icon: "🐭" }
+        ],
+        "🐬 海洋生物 Ocean": [
+            { en: "Whale", zh: "鯨魚", icon: "🐋" },
+            { en: "Dolphin", zh: "海豚", icon: "🐬" },
+            { en: "Shark", zh: "鯊魚", icon: "🦈" },
+            { en: "Octopus", zh: "章魚", icon: "🐙" },
+            { en: "Squid", zh: "烏賊", icon: "🦑" },
+            { en: "Crab", zh: "螃蟹", icon: "🦀" },
+            { en: "Lobster", zh: "龍蝦", icon: "🦞" },
+            { en: "Shrimp", zh: "蝦子", icon: "🦐" },
+            { en: "Fish", zh: "魚", icon: "🐠" },
+            { en: "Turtle", zh: "烏龜", icon: "🐢" },
+            { en: "Penguin", zh: "企鵝", icon: "🐧" },
+            { en: "Seal", zh: "海豹", icon: "🦭" }
+        ],
+        "🐞 昆蟲世界 Bugs": [
+            { en: "Butterfly", zh: "蝴蝶", icon: "🦋" },
+            { en: "Bee", zh: "蜜蜂", icon: "🐝" },
+            { en: "Ant", zh: "螞蟻", icon: "🐜" },
+            { en: "Ladybug", zh: "瓢蟲", icon: "🐞" },
+            { en: "Spider", zh: "蜘蛛", icon: "🕷️" },
+            { en: "Caterpillar", zh: "毛毛蟲", icon: "🐛" },
+            { en: "Snail", zh: "蝸牛", icon: "🐌" },
+            { en: "Mosquito", zh: "蚊子", icon: "🦟" },
+            { en: "Beetle", zh: "甲蟲", icon: "🪲" },
+            { en: "Scorpion", zh: "蠍子", icon: "🦂" }
+        ],
+        "🍎 水果 Fruits": [
+            { en: "Apple", zh: "蘋果", icon: "🍎" },
+            { en: "Banana", zh: "香蕉", icon: "🍌" },
+            { en: "Grape", zh: "葡萄", icon: "🍇" },
+            { en: "Watermelon", zh: "西瓜", icon: "🍉" },
+            { en: "Strawberry", zh: "草莓", icon: "🍓" },
+            { en: "Cherry", zh: "櫻桃", icon: "🍒" },
+            { en: "Peach", zh: "桃子", icon: "🍑" },
+            { en: "Pineapple", zh: "鳳梨", icon: "🍍" },
+            { en: "Mango", zh: "芒果", icon: "🥭" },
+            { en: "Lemon", zh: "檸檬", icon: "🍋" },
+            { en: "Orange", zh: "橘子", icon: "🍊" },
+            { en: "Kiwi", zh: "奇異果", icon: "🥝" },
+            { en: "Melon", zh: "哈密瓜", icon: "🍈" },
+            { en: "Pear", zh: "梨子", icon: "🍐" }
+        ],
+        "🥦 蔬菜 Vegetables": [
+            { en: "Carrot", zh: "紅蘿蔔", icon: "🥕" },
+            { en: "Corn", zh: "玉米", icon: "🌽" },
+            { en: "Broccoli", zh: "花椰菜", icon: "🥦" },
+            { en: "Mushroom", zh: "蘑菇", icon: "🍄" },
+            { en: "Tomato", zh: "番茄", icon: "🍅" },
+            { en: "Potato", zh: "馬鈴薯", icon: "🥔" },
+            { en: "Onion", zh: "洋蔥", icon: "🧅" },
+            { en: "Garlic", zh: "大蒜", icon: "🧄" },
+            { en: "Pepper", zh: "辣椒", icon: "🌶️" },
+            { en: "Cucumber", zh: "小黃瓜", icon: "🥒" },
+            { en: "Eggplant", zh: "茄子", icon: "🍆" }
+        ],
+        "🍔 美食 Food": [
+            { en: "Hamburger", zh: "漢堡", icon: "🍔" },
+            { en: "Fries", zh: "薯條", icon: "🍟" },
+            { en: "Pizza", zh: "披薩", icon: "🍕" },
+            { en: "Hotdog", zh: "熱狗", icon: "🌭" },
+            { en: "Sandwich", zh: "三明治", icon: "🥪" },
+            { en: "Taco", zh: "塔可餅", icon: "🌮" },
+            { en: "Rice", zh: "飯", icon: "🍚" },
+            { en: "Noodles", zh: "麵", icon: "🍜" },
+            { en: "Spaghetti", zh: "義大利麵", icon: "🍝" },
+            { en: "Sushi", zh: "壽司", icon: "🍣" },
+            { en: "Bread", zh: "麵包", icon: "🍞" },
+            { en: "Egg", zh: "蛋", icon: "🍳" },
+            { en: "Meat", zh: "肉", icon: "🥩" },
+            { en: "Chicken", zh: "雞腿", icon: "🍗" }
+        ],
+        "🍰 甜點 Sweets": [
+            { en: "Ice Cream", zh: "冰淇淋", icon: "🍦" },
+            { en: "Cake", zh: "蛋糕", icon: "🍰" },
+            { en: "Cookie", zh: "餅乾", icon: "🍪" },
+            { en: "Donut", zh: "甜甜圈", icon: "🍩" },
+            { en: "Chocolate", zh: "巧克力", icon: "🍫" },
+            { en: "Candy", zh: "糖果", icon: "🍬" },
+            { en: "Lollipop", zh: "棒棒糖", icon: "🍭" },
+            { en: "Popcorn", zh: "爆米花", icon: "🍿" },
+            { en: "Pudding", zh: "布丁", icon: "🍮" },
+            { en: "Honey", zh: "蜂蜜", icon: "🍯" },
+            { en: "Milk", zh: "牛奶", icon: "🥛" },
+            { en: "Juice", zh: "果汁", icon: "🧃" }
+        ],
+        "👕 衣服 Clothing": [
+            { en: "T-shirt", zh: "T恤", icon: "👕" },
+            { en: "Jeans", zh: "牛仔褲", icon: "👖" },
+            { en: "Dress", zh: "洋裝", icon: "👗" },
+            { en: "Coat", zh: "外套", icon: "🧥" },
+            { en: "Socks", zh: "襪子", icon: "🧦" },
+            { en: "Shoe", zh: "鞋子", icon: "👟" },
+            { en: "Hat", zh: "帽子", icon: "🧢" },
+            { en: "Scarf", zh: "圍巾", icon: "🧣" },
+            { en: "Gloves", zh: "手套", icon: "🧤" },
+            { en: "Glasses", zh: "眼鏡", icon: "👓" },
+            { en: "Tie", zh: "領帶", icon: "👔" },
+            { en: "Bag", zh: "包包", icon: "🎒" },
+            { en: "Umbrella", zh: "雨傘", icon: "🌂" },
+            { en: "Ring", zh: "戒指", icon: "💍" }
+        ],
+        "🏫 學校 School": [
+            { en: "Pencil", zh: "鉛筆", icon: "✏️" },
+            { en: "Pen", zh: "原子筆", icon: "🖊️" },
+            { en: "Book", zh: "書", icon: "📖" },
+            { en: "Notebook", zh: "筆記本", icon: "📓" },
+            { en: "Ruler", zh: "尺", icon: "📏" },
+            { en: "Scissors", zh: "剪刀", icon: "✂️" },
+            { en: "Crayon", zh: "蠟筆", icon: "🖍️" },
+            { en: "Backpack", zh: "書包", icon: "🎒" },
+            { en: "Computer", zh: "電腦", icon: "💻" },
+            { en: "Art", zh: "美術", icon: "🎨" },
+            { en: "Music", zh: "音樂", icon: "🎵" },
+            { en: "Bus", zh: "校車", icon: "🚌" }
+        ],
+        "⚽ 運動 Sports": [
+            { en: "Soccer", zh: "足球", icon: "⚽" },
+            { en: "Basketball", zh: "籃球", icon: "🏀" },
+            { en: "Baseball", zh: "棒球", icon: "⚾" },
+            { en: "Tennis", zh: "網球", icon: "🎾" },
+            { en: "Volleyball", zh: "排球", icon: "🏐" },
+            { en: "Ping Pong", zh: "桌球", icon: "🏓" },
+            { en: "Badminton", zh: "羽球", icon: "🏸" },
+            { en: "Bowling", zh: "保齡球", icon: "🎳" },
+            { en: "Swimming", zh: "游泳", icon: "🏊" },
+            { en: "Running", zh: "跑步", icon: "🏃" },
+            { en: "Cycling", zh: "騎車", icon: "🚴" },
+            { en: "Trophy", zh: "獎盃", icon: "🏆" }
+        ],
+        "⛅ 天氣 Weather": [
+            { en: "Sunny", zh: "晴天", icon: "☀️" },
+            { en: "Cloudy", zh: "多雲", icon: "☁️" },
+            { en: "Rainy", zh: "雨天", icon: "🌧️" },
+            { en: "Snowy", zh: "下雪", icon: "🌨️" },
+            { en: "Windy", zh: "颳風", icon: "🌬️" },
+            { en: "Storm", zh: "暴風雨", icon: "⛈️" },
+            { en: "Thunder", zh: "打雷", icon: "⚡" },
+            { en: "Rainbow", zh: "彩虹", icon: "🌈" },
+            { en: "Star", zh: "星星", icon: "⭐" },
+            { en: "Moon", zh: "月亮", icon: "🌙" }
+        ],
+        "😊 情緒 Feelings": [
+            { en: "Happy", zh: "快樂", icon: "😊" },
+            { en: "Sad", zh: "難過", icon: "😢" },
+            { en: "Angry", zh: "生氣", icon: "😠" },
+            { en: "Surprised", zh: "驚訝", icon: "😲" },
+            { en: "Scared", zh: "害怕", icon: "😱" },
+            { en: "Sleepy", zh: "想睡", icon: "😴" },
+            { en: "Sick", zh: "生病", icon: "🤒" },
+            { en: "Cold", zh: "冷", icon: "🥶" },
+            { en: "Hot", zh: "熱", icon: "🥵" },
+            { en: "Love", zh: "愛", icon: "🥰" }
+        ],
+        "🚒 交通 Vehicles": [
+            { en: "Car", zh: "汽車", icon: "🚗" },
+            { en: "Taxi", zh: "計程車", icon: "🚕" },
+            { en: "Bus", zh: "公車", icon: "🚌" },
+            { en: "Police Car", zh: "警車", icon: "🚓" },
+            { en: "Fire Truck", zh: "消防車", icon: "🚒" },
+            { en: "Ambulance", zh: "救護車", icon: "🚑" },
+            { en: "Truck", zh: "卡車", icon: "🚚" },
+            { en: "Train", zh: "火車", icon: "🚂" },
+            { en: "Bullet Train", zh: "高鐵", icon: "🚅" },
+            { en: "Bicycle", zh: "腳踏車", icon: "🚲" },
+            { en: "Motorcycle", zh: "機車", icon: "🛵" },
+            { en: "Airplane", zh: "飛機", icon: "✈️" },
+            { en: "Helicopter", zh: "直升機", icon: "🚁" },
+            { en: "Rocket", zh: "火箭", icon: "🚀" },
+            { en: "Boat", zh: "船", icon: "🚢" },
+            { en: "Tractor", zh: "拖拉機", icon: "🚜" }
+        ],
+        "🦖 恐龍 Dinosaurs": [
+            { en: "T-Rex", zh: "暴龍", icon: "🦖" },
+            { en: "Triceratops", zh: "三角龍", icon: "🦕" },
+            { en: "Brachiosaurus", zh: "腕龍", icon: "🦕" },
+            { en: "Stegosaurus", zh: "劍龍", icon: "🦎" },
+            { en: "Pteranodon", zh: "翼龍", icon: "🦅" },
+            { en: "Dinosaur Egg", zh: "恐龍蛋", icon: "🥚" },
+            { en: "Fossil", zh: "化石", icon: "🦴" },
+            { en: "Volcano", zh: "火山", icon: "🌋" }
+        ],
+        "🌍 世界地圖 World": [
+            { en: "Taiwan", zh: "台灣", icon: "🇹🇼", code: "tw" },
+            { en: "USA", zh: "美國", icon: "🇺🇸", code: "us" },
+            { en: "Japan", zh: "日本", icon: "🇯🇵", code: "jp" },
+            { en: "China", zh: "中國", icon: "🇨🇳", code: "cn" },
+            { en: "UK", zh: "英國", icon: "🇬🇧", code: "gb" },
+            { en: "France", zh: "法國", icon: "🇫🇷", code: "fr" },
+            { en: "Germany", zh: "德國", icon: "🇩🇪", code: "de" },
+            { en: "Italy", zh: "義大利", icon: "🇮🇹", code: "it" },
+            { en: "Canada", zh: "加拿大", icon: "🇨🇦", code: "ca" },
+            { en: "Australia", zh: "澳洲", icon: "🇦🇺", code: "au" },
+            { en: "Korea", zh: "韓國", icon: "🇰🇷", code: "kr" },
+            { en: "World", zh: "世界", icon: "🌎" }
+        ],
+        "🔢 數字 Numbers": [
+            { en: "One", zh: "1", speak: "One", icon: "1️⃣" },
+            { en: "Two", zh: "2", speak: "Two", icon: "2️⃣" },
+            { en: "Three", zh: "3", speak: "Three", icon: "3️⃣" },
+            { en: "Four", zh: "4", speak: "Four", icon: "4️⃣" },
+            { en: "Five", zh: "5", speak: "Five", icon: "5️⃣" },
+            { en: "Six", zh: "6", speak: "Six", icon: "6️⃣" },
+            { en: "Seven", zh: "7", speak: "Seven", icon: "7️⃣" },
+            { en: "Eight", zh: "8", speak: "Eight", icon: "8️⃣" },
+            { en: "Nine", zh: "9", speak: "Nine", icon: "9️⃣" },
+            { en: "Ten", zh: "10", speak: "Ten", icon: "🔟" }
+        ],
+        "🎨 顏色 Colors": [
+            { en: "Red", zh: "紅色", icon: "🟥" },
+            { en: "Blue", zh: "藍色", icon: "🟦" },
+            { en: "Yellow", zh: "黃色", icon: "🟨" },
+            { en: "Green", zh: "綠色", icon: "🟩" },
+            { en: "Orange", zh: "橘色", icon: "🟧" },
+            { en: "Purple", zh: "紫色", icon: "🟪" },
+            { en: "Pink", zh: "粉紅色", icon: "🌸" },
+            { en: "Black", zh: "黑色", icon: "⬛" },
+            { en: "White", zh: "白色", icon: "⬜" }
+        ]
+    };
+
+    // ==========================================
+    //  2. State
+    // ==========================================
+    let currentRoom = Object.keys(db)[0];
+    let isQuiz = false;
+    let quizTarget = null;
+    let currentItem = null;
+    let imgCache = {};
+    let isFocusMode = false;
+    let focusIndex = 0;
+    let activeItems = []; 
+    let mediaRecorder = null; 
+    let globalStream = null; // **Fix: Reuse stream**
+
+    let displayMode = 0;
+    const modeConfigs = [
+        { text: "📖 顯示：中+英", showEn: true, showZh: true },
+        { text: "🔤 顯示：英文", showEn: true, showZh: false },
+        { text: "🈷️ 顯示：中文", showEn: false, showZh: true },
+        { text: "🖼️ 顯示：只有圖", showEn: false, showZh: false }
+    ];
+
+    function init() {
+        renderNav();
+        loadRoom(currentRoom);
+    }
+
+    function renderNav() {
+        const nav = document.getElementById('navBar');
+        nav.innerHTML = '';
+        Object.keys(db).forEach(room => {
+            const btn = document.createElement('span');
+            const isPhonics = room.includes("🔤");
+            const displayName = room.includes(" ") ? room.split(" ")[1] : room;
+            btn.className = `room-tab ${room === currentRoom ? 'active' : ''} ${isPhonics ? 'phonics-tab' : ''}`;
+            btn.innerText = displayName;
+            btn.onclick = () => {
+                document.getElementById('searchInput').value = "";
+                loadRoom(room);
+            };
+            nav.appendChild(btn);
+        });
+    }
+
+    function loadRoom(room) {
+        currentRoom = room;
+        activeItems = db[room];
+        renderGrid();
+        renderNav();
+        if(isQuiz) nextQuestion();
+        if(isFocusMode) {
+            focusIndex = 0;
+            renderFocusCard();
+        }
+    }
+
+    function handleSearch() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        if(!query) {
+            loadRoom(currentRoom);
+            return;
+        }
+        let results = [];
+        Object.keys(db).forEach(key => {
+            db[key].forEach(item => {
+                if(item.en.toLowerCase().includes(query) || item.zh.includes(query)) {
+                    results.push(item);
+                }
+            });
+        });
+        activeItems = results;
+        renderGrid();
+        if(isFocusMode) {
+            focusIndex = 0;
+            renderFocusCard();
+        }
+    }
+
+    function cycleMode() {
+        displayMode = (displayMode + 1) % 4;
+        updateModeUI();
+    }
+
+    function updateModeUI() {
+        const config = modeConfigs[displayMode];
+        document.getElementById('btnMode').innerText = config.text;
+        renderGrid();
+        if(isFocusMode) renderFocusCard();
+    }
+
+    // --- Render Grid ---
+    function renderGrid() {
+        const grid = document.getElementById('cardGrid');
+        grid.innerHTML = '';
+        const isWorldMap = currentRoom.includes("World") && document.getElementById('searchInput').value === "";
+        const isPhonics = currentRoom.includes("🔤");
+        const config = modeConfigs[displayMode];
+
+        grid.classList.remove('hide-zh', 'hide-en', 'hide-text');
+        if (!config.showZh) grid.classList.add('hide-zh');
+        if (!config.showEn) grid.classList.add('hide-en');
+        if (!config.showZh && !config.showEn) grid.classList.add('hide-text'); 
+
+        activeItems.forEach((item, index) => {
+            const card = document.createElement('div');
+            let classes = ['card'];
+            if(item.speak) classes.push('phonics-card');
+            if(isWorldMap && item.code) classes.push('flag-card');
+            card.className = classes.join(' ');
+            
+            let bgColor = "#f0f0f0";
+            if (item.rule) bgColor = stringToPastelColor(item.rule); 
+            else bgColor = stringToColor(item.en);
+
+            let visualContent = "";
+            let topLabel = "";
+
+            if (isPhonics && item.rule) {
+                topLabel = `<div class="rule-tag" style="background:${stringToDarkerColor(item.rule)}">${item.rule}</div>`;
+                visualContent = `<div class="card-img" style="background:${bgColor}">${item.icon}</div>`;
+            } else if (isWorldMap && item.code) {
+                visualContent = `<div class="card-img"><img src="https://flagcdn.com/h240/${item.code}.png" alt="${item.en}"></div>`;
+            } else {
+                visualContent = `<div class="card-img" style="background:${bgColor};opacity:0.8">${item.icon}</div>`;
+            }
+            
+            card.innerHTML = `
+                ${topLabel}
+                ${visualContent}
+                <div class="card-body">
+                    <span class="en-word">${item.en}</span>
+                    <span class="zh-word">${item.zh}</span>
+                </div>
+            `;
+            
+            card.onclick = (e) => handleClick(item, card, index);
+            grid.appendChild(card);
+        });
+        
+        if(activeItems.length === 0) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#999;padding:20px;">找不到這個單字喔...</div>';
+        }
+    }
+
+    // --- Audio Stream Helper (Fix for permission) ---
+    async function getAudioStream() {
+        // If stream exists and is active, reuse it
+        if (globalStream && globalStream.active) return globalStream;
+        
+        try {
+            // Request permission once
+            globalStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            return globalStream;
+        } catch (err) {
+            console.error(err);
+            alert("無法存取麥克風，請檢查權限或使用 HTTPS 連線。");
+            return null;
+        }
+    }
+
+    // --- Record Logic ---
+    async function toggleRecord(event, btn) {
+        event.stopPropagation(); 
+
+        // 1. Get Stream (Reused)
+        const stream = await getAudioStream();
+        if(!stream) return;
+
+        const container = btn.parentElement;
+        if (container.classList.contains('recording')) return;
+
+        try {
+            mediaRecorder = new MediaRecorder(stream);
+            const audioChunks = [];
+
+            mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                audio.play(); 
+                container.classList.remove('recording');
+                // Note: We do NOT stop tracks here to keep permission alive
+            };
+
+            mediaRecorder.start();
+            container.classList.add('recording'); 
+
+            setTimeout(() => {
+                if (mediaRecorder.state === "recording") {
+                    mediaRecorder.stop();
+                }
+            }, 2000); 
+
+        } catch (err) {
+            console.error("Recorder Error:", err);
+        }
+    }
+
+    function handleClick(item, cardElem, index) {
+        if (!isQuiz) {
+            const text = item.speak ? item.speak : item.en;
+            speak(text);
+            
+            if(cardElem) {
+                cardElem.style.transform = "scale(1.05)";
+                setTimeout(() => cardElem.style.transform = "", 200);
+            }
+
+            const isPhonicsCategory = currentRoom.includes("🔤");
+            if (!isPhonicsCategory && !isFocusMode) {
+                currentItem = item;
+                openImageModal(item);
+            }
+        } else {
+            if (item.en === quizTarget.en) {
+                if(cardElem) cardElem.classList.add('correct');
+                if(isFocusMode) {
+                    document.getElementById('focusCard').style.borderColor = "#4CAF50";
+                    document.getElementById('focusCard').style.background = "#E8F5E9";
+                }
+                speak("Great job!");
+                setTimeout(() => {
+                    if(cardElem) cardElem.classList.remove('correct');
+                    if(isFocusMode) {
+                        const fc = document.getElementById('focusCard');
+                        fc.style.borderColor = "white";
+                        fc.style.background = "white";
+                    }
+                    nextQuestion();
+                }, 1500);
+            } else {
+                if(cardElem) cardElem.classList.add('wrong');
+                if(isFocusMode) {
+                    const fc = document.getElementById('focusCard');
+                    fc.style.borderColor = "#F44336";
+                    setTimeout(() => fc.style.borderColor = "white", 500);
+                }
+                speak("Try again!");
+                setTimeout(() => { if(cardElem) cardElem.classList.remove('wrong'); }, 500);
+            }
+        }
+    }
+
+    function toggleFocusMode() {
+        isFocusMode = !isFocusMode;
+        const overlay = document.getElementById('focusOverlay');
+        const btn = document.getElementById('btnFocus');
+        if(isFocusMode) {
+            overlay.style.display = 'flex';
+            btn.classList.add('active');
+            focusIndex = 0;
+            renderFocusCard();
+        } else {
+            overlay.style.display = 'none';
+            btn.classList.remove('active');
+        }
+    }
+
+    function focusNav(dir) {
+        focusIndex += dir;
+        if(focusIndex < 0) focusIndex = activeItems.length - 1;
+        if(focusIndex >= activeItems.length) focusIndex = 0;
+        renderFocusCard();
+    }
+    
+    function renderFocusCard() {
+        if(activeItems.length === 0) return;
+        const item = activeItems[focusIndex];
+        const container = document.getElementById('focusContent');
+        const ruleDisplay = document.getElementById('focusRule');
+        const bgLayer = document.getElementById('focusBg');
+        const micContainer = document.getElementById('focusMicContainer');
+        const isWorldMap = currentRoom.includes("World") && !document.getElementById('searchInput').value;
+        const config = modeConfigs[displayMode];
+        
+        let bgColor = item.rule ? stringToPastelColor(item.rule) : stringToColor(item.en);
+        bgLayer.style.background = item.rule ? bgColor : `#${bgColor}`;
+        bgLayer.style.opacity = item.rule ? "0.3" : "0.1";
+
+        ruleDisplay.innerText = item.rule ? item.rule : "";
+        ruleDisplay.style.color = stringToDarkerColor(item.rule || item.en);
+
+        let visual = `<div class="focus-icon">${item.icon}</div>`;
+        if(isWorldMap && item.code) {
+            visual = `<img src="https://flagcdn.com/h240/${item.code}.png" class="focus-flag-img">`;
+        }
+
+        let enStyle = config.showEn ? '' : 'opacity:0';
+        let zhStyle = config.showZh ? '' : 'opacity:0';
+
+        container.innerHTML = `
+            ${visual}
+            <div class="focus-en" style="${enStyle}">${item.en}</div>
+            <div class="focus-zh" style="${zhStyle}">${item.zh}</div>
+            <div style="margin-top:20px;color:#999;font-size:0.9rem;">${focusIndex + 1} / ${activeItems.length}</div>
+        `;
+
+        if(isQuiz) {
+            micContainer.style.display = 'none';
+        } else {
+            micContainer.style.display = 'flex';
+            setTimeout(() => {
+                const text = item.speak ? item.speak : item.en;
+                speak(text);
+            }, 300);
+        }
+    }
+
+    function handleFocusClick() {
+        if(activeItems.length > 0) {
+            handleClick(activeItems[focusIndex], null, focusIndex);
+        }
+    }
+
+    async function openImageModal(item, forceRandom = false) {
+        const modal = document.getElementById('imgModal');
+        const realImg = document.getElementById('realImage');
+        const loader = document.getElementById('modalLoader');
+        const sourceTag = document.getElementById('imgSource');
+        const enText = document.getElementById('modalEn');
+        const zhText = document.getElementById('modalZh');
+
+        modal.style.display = 'flex';
+        enText.innerText = item.en;
+        zhText.innerText = item.zh;
+        
+        realImg.style.display = 'none';
+        loader.style.display = 'block';
+        sourceTag.style.display = 'none';
+
+        if (forceRandom) { loadRandomImage(item.en); return; }
+        if (imgCache[item.en]) { showImg(imgCache[item.en], 'Wiki (Cached)'); return; }
+
+        try {
+            const keyword = item.en.split(" ")[0].trim().replace(/ /g, "_");
+            const wikiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${keyword}`;
+            const response = await fetch(wikiUrl);
+            if (!response.ok) throw new Error("Wiki Not Found");
+            const data = await response.json();
+            if (data.thumbnail && data.thumbnail.source) {
+                const imgSrc = data.thumbnail.source;
+                imgCache[item.en] = imgSrc; 
+                showImg(imgSrc, 'Wiki');
+            } else {
+                throw new Error("No Wiki Image");
+            }
+        } catch (error) {
+            loadRandomImage(item.en);
+        }
+    }
+
+    function loadRandomImage(keywordRaw) {
+        const realImg = document.getElementById('realImage');
+        const loader = document.getElementById('modalLoader');
+        loader.innerText = "🔍 搜尋網路美圖...";
+        let keyword = keywordRaw.split(" ")[0].toLowerCase();
+        let searchPath = keyword;
+        if (currentRoom.includes("World") || currentRoom.includes("地圖")) {
+             searchPath = `${keyword},landscape,landmark/all`;
+        }
+        const randomLock = Math.floor(Math.random() * 10000);
+        const imgUrl = `https://loremflickr.com/500/400/${searchPath}?lock=${randomLock}`;
+        const tempImg = new Image();
+        tempImg.src = imgUrl;
+        tempImg.onload = () => showImg(imgUrl, 'Web');
+        tempImg.onerror = () => { loader.innerText = "❌ 找不到圖片"; };
+    }
+
+    function showImg(url, source) {
+        const realImg = document.getElementById('realImage');
+        const loader = document.getElementById('modalLoader');
+        const sourceTag = document.getElementById('imgSource');
+        realImg.src = url;
+        loader.style.display = 'none';
+        realImg.style.display = 'block';
+        sourceTag.innerText = source;
+        sourceTag.style.display = 'block';
+        sourceTag.style.background = source.includes('Wiki') ? 'rgba(0,0,0,0.6)' : 'rgba(255,165,0,0.8)';
+    }
+
+    function handleFallback() { if(currentItem) loadRandomImage(currentItem.en); }
+    function forceRandomReload() { if(currentItem) openImageModal(currentItem, true); }
+    function closeModal() { document.getElementById('imgModal').style.display = 'none'; }
+
+    function stringToColor(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+        return "00000".substring(0, 6 - c.length) + c;
+    }
+    function stringToPastelColor(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        const hue = hash % 360;
+        return `hsl(${hue}, 70%, 90%)`; 
+    }
+    function stringToDarkerColor(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        const hue = hash % 360;
+        return `hsl(${hue}, 60%, 40%)`; 
+    }
+
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US';
+        u.rate = 0.85; 
+        window.speechSynthesis.speak(u);
+    }
+
+    function toggleQuiz() {
+        isQuiz = !isQuiz;
+        const area = document.getElementById('quizArea');
+        const btn = document.querySelector('.btn-quiz');
+        if (isQuiz) {
+            area.style.display = 'block';
+            btn.innerText = "📚 回到學習";
+            btn.style.background = "#FF6B6B";
+            nextQuestion();
+        } else {
+            area.style.display = 'none';
+            btn.innerText = "🎮 測驗";
+            btn.style.background = "var(--primary)";
+        }
+        if(isFocusMode) renderFocusCard();
+    }
+
+    function nextQuestion() {
+        if (!activeItems || activeItems.length === 0) return;
+        let newItem;
+        do {
+            newItem = activeItems[Math.floor(Math.random() * activeItems.length)];
+        } while (activeItems.length > 1 && quizTarget && newItem.en === quizTarget.en);
+        
+        quizTarget = newItem;
+        const qText = document.getElementById('quizQuestion');
+        
+        if (currentRoom.includes("🔤")) {
+             qText.innerText = `👂 哪個是 "${quizTarget.en}" ?`;
+             const hint = quizTarget.speak ? quizTarget.speak : quizTarget.en;
+             speak(`Find ${hint}`);
+        } else {
+             qText.innerText = `👂 Find: "${quizTarget.en}"`;
+             speak(`Where is the ${quizTarget.en}?`);
+        }
+    }
+
+    init();
+
+</script>
+</body>
+</html>

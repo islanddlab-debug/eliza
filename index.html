@@ -16,7 +16,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
-        /* --- 核心變數 --- */
         :root {
             --primary: #FF9F1C;
             --secondary: #2EC4B6;
@@ -35,15 +34,15 @@
             font-family: 'Fredoka', 'Microsoft JhengHei', sans-serif; 
             background: var(--bg); 
             margin: 0; 
-            padding-bottom: 80px; /* 預留底部空間 */
-            padding-top: env(safe-area-inset-top); /* 避開瀏海 */
+            padding-bottom: 80px; 
+            padding-top: env(safe-area-inset-top);
             color: var(--text-main);
             overflow-x: hidden;
             font-size: 18px;
-            overscroll-behavior-y: none; /* 防止下拉重整 */
+            overscroll-behavior-y: none;
         }
         
-        /* --- Header --- */
+        /* Header Auto-Hide */
         .header-area {
             position: fixed; top: 0; left: 0; z-index: 100;
             background: rgba(255,255,255,0.95);
@@ -53,7 +52,6 @@
             transition: transform 0.3s ease;
             padding-top: env(safe-area-inset-top);
         }
-
         .header-area.header-hidden { transform: translateY(-100%); }
 
         .header-inner {
@@ -61,7 +59,7 @@
             padding: 10px var(--side-gap) 0 var(--side-gap);
         }
 
-        .spacer { height: 160px; } /* 佔位符 */
+        .spacer { height: 160px; }
 
         .top-row {
             display: flex; justify-content: space-between; align-items: center;
@@ -118,13 +116,11 @@
             transition: all 0.2s; font-family: 'Fredoka', sans-serif;
         }
         .room-tab.active { background: var(--secondary); color: white; border-color: var(--secondary); transform: scale(1.05); }
-        /* 最愛標籤樣式 */
         .room-tab.fav-tab { border-color: var(--love); color: var(--love); }
         .room-tab.fav-tab.active { background: var(--love); color: white; }
         .room-tab.phonics-tab { border-color: var(--phonics); color: var(--phonics); }
         .room-tab.phonics-tab.active { background: var(--phonics); color: white; border-color: var(--phonics); }
 
-        /* --- Content --- */
         .main-container { max-width: 1200px; margin: 0 auto; padding: 0 var(--side-gap); }
 
         #quizArea {
@@ -149,7 +145,6 @@
             .spacer { height: 180px; }
         }
 
-        /* --- Card Styles --- */
         .card {
             background: var(--card-bg); border-radius: 20px; text-align: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer;
@@ -185,7 +180,7 @@
         .card.wrong { border-color: #F44336; opacity: 0.6; animation: shake 0.4s; }
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
 
-        /* --- Focus Mode & Modal --- */
+        /* Focus Mode & Modal */
         #focusOverlay, .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(244, 247, 246, 0.95); z-index: 500; display: none;
@@ -209,7 +204,7 @@
         .focus-zh { font-size: 1.6rem; color: #666; margin-bottom: 20px; transition: opacity 0.3s; }
         .focus-flag-img { width: 90%; height: auto; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
-        /* 愛心按鈕 (右上角) */
+        /* 愛心按鈕 (樣式修正：移除 active 時的邊框顏色) */
         .fav-btn {
             position: absolute; top: 20px; right: 20px;
             background: white; width: 50px; height: 50px; border-radius: 50%;
@@ -218,14 +213,11 @@
             cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 5;
             transition: 0.2s;
         }
-        .fav-btn.active { color: var(--love); border-color: var(--love); transform: scale(1.1); }
+        /* 點擊後只變紅心，不變邊框，比較好看 */
+        .fav-btn.active { color: var(--love); border-color: #f0f0f0; transform: scale(1.1); }
 
-        /* 底部控制區：錄音 + 蝸牛 */
-        .focus-controls {
-            display: flex; gap: 20px; align-items: center; justify-content: center; margin-top: 10px;
-        }
+        .focus-controls { display: flex; gap: 20px; align-items: center; justify-content: center; margin-top: 10px; }
 
-        /* 蝸牛按鈕 */
         .snail-btn {
             width: 45px; height: 45px; border-radius: 50%;
             background: #E3F2FD; border: none; color: #1565C0;
@@ -234,7 +226,6 @@
         }
         .snail-btn:active { transform: scale(0.9); }
 
-        /* 麥克風 */
         .focus-mic-container { position: relative; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; }
         .focus-mic-btn {
             width: 60px; height: 60px; border-radius: 50%;
@@ -253,7 +244,6 @@
         .recording .focus-progress-ring__circle { stroke-dashoffset: 0; transition: stroke-dashoffset 2s linear; }
         @keyframes pulse-red { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* 導航 */
         .focus-nav-btn {
             position: absolute; top: 50%; transform: translateY(-50%);
             background: white; border: none; width: 50px; height: 50px;
@@ -266,12 +256,11 @@
             .prev-btn { left: 15%; } .next-btn { right: 15%; }
         }
         .close-circle-btn {
-            position: absolute; top: 20px; left: 20px; /* 改到左上角，因為右上角給愛心了 */
+            position: absolute; top: 20px; left: 20px;
             width: 40px; height: 40px; border-radius: 50%; background: #eee;
             border: none; font-weight: bold; cursor: pointer; color: #555; z-index: 502;
         }
 
-        /* Modal */
         .modal-content {
             background: white; padding: 20px; border-radius: 25px;
             text-align: center; width: 90%; max-width: 500px;
@@ -368,10 +357,9 @@
 
 <script>
     // =========================================================
-    //  1. 詞庫 (資料略，與前版相同，請保留所有分類)
+    //  1. 詞庫
     // =========================================================
     const db = {
-        // --- 🔤 自然發音 ---
         "🔤 字母 A-Z": [
             { rule: "A", en: "Apple", zh: "蘋果", icon: "🍎", speak: "A, Apple" },
             { rule: "A", en: "Ant", zh: "螞蟻", icon: "🐜", speak: "A, Ant" },
@@ -626,65 +614,6 @@
             { en: "Milk", zh: "牛奶", icon: "🥛" },
             { en: "Juice", zh: "果汁", icon: "🧃" }
         ],
-        // --- 認知基礎 ---
-        "🔢 數字 Numbers": [
-            { en: "One", zh: "1", speak: "One", icon: "1️⃣" },
-            { en: "Two", zh: "2", speak: "Two", icon: "2️⃣" },
-            { en: "Three", zh: "3", speak: "Three", icon: "3️⃣" },
-            { en: "Four", zh: "4", speak: "Four", icon: "4️⃣" },
-            { en: "Five", zh: "5", speak: "Five", icon: "5️⃣" },
-            { en: "Six", zh: "6", speak: "Six", icon: "6️⃣" },
-            { en: "Seven", zh: "7", speak: "Seven", icon: "7️⃣" },
-            { en: "Eight", zh: "8", speak: "Eight", icon: "8️⃣" },
-            { en: "Nine", zh: "9", speak: "Nine", icon: "9️⃣" },
-            { en: "Ten", zh: "10", speak: "Ten", icon: "🔟" }
-        ],
-        "🎨 顏色 Colors": [
-            { en: "Red", zh: "紅色", icon: "🟥" },
-            { en: "Blue", zh: "藍色", icon: "🟦" },
-            { en: "Yellow", zh: "黃色", icon: "🟨" },
-            { en: "Green", zh: "綠色", icon: "🟩" },
-            { en: "Orange", zh: "橘色", icon: "🟧" },
-            { en: "Purple", zh: "紫色", icon: "🟪" },
-            { en: "Pink", zh: "粉紅色", icon: "🌸" },
-            { en: "Black", zh: "黑色", icon: "⬛" },
-            { en: "White", zh: "白色", icon: "⬜" }
-        ],
-        "🔷 形狀 Shapes": [
-            { en: "Circle", zh: "圓形", icon: "🔴" },
-            { en: "Square", zh: "正方形", icon: "🟥" },
-            { en: "Triangle", zh: "三角形", icon: "🔺" },
-            { en: "Star", zh: "星星", icon: "⭐" },
-            { en: "Heart", zh: "愛心", icon: "❤️" }
-        ],
-        // --- 生活場景 ---
-        "👀 身體 Body": [
-            { en: "Head", zh: "頭", icon: "👦" },
-            { en: "Eye", zh: "眼睛", icon: "👁️" },
-            { en: "Nose", zh: "鼻子", icon: "👃" },
-            { en: "Mouth", zh: "嘴巴", icon: "👄" },
-            { en: "Ear", zh: "耳朵", icon: "👂" },
-            { en: "Hand", zh: "手", icon: "✋" },
-            { en: "Arm", zh: "手臂", icon: "💪" },
-            { en: "Leg", zh: "腿", icon: "🦵" },
-            { en: "Foot", zh: "腳", icon: "🦶" }
-        ],
-        "🛋️ 客廳 Living": [
-            { en: "Sofa", zh: "沙發", icon: "🛋️" },
-            { en: "TV", zh: "電視", icon: "📺" },
-            { en: "Table", zh: "桌子", icon: "🟫" },
-            { en: "Chair", zh: "椅子", icon: "🪑" },
-            { en: "Lamp", zh: "燈", icon: "💡" },
-            { en: "Fan", zh: "風扇", icon: "🌬️" }
-        ],
-        "🍳 廚房 Kitchen": [
-            { en: "Fridge", zh: "冰箱", icon: "❄️" },
-            { en: "Oven", zh: "烤箱", icon: "🥐" },
-            { en: "Pan", zh: "平底鍋", icon: "🍳" },
-            { en: "Pot", zh: "鍋子", icon: "🍲" },
-            { en: "Cup", zh: "杯子", icon: "🥤" },
-            { en: "Spoon", zh: "湯匙", icon: "🥄" }
-        ],
         "👕 衣服 Clothing": [
             { en: "T-shirt", zh: "T恤", icon: "👕" },
             { en: "Jeans", zh: "牛仔褲", icon: "👖" },
@@ -760,6 +689,65 @@
             { en: "Teacher", zh: "老師", icon: "👩‍🏫" },
             { en: "Cook", zh: "廚師", icon: "👨‍🍳" },
             { en: "Farmer", zh: "農夫", icon: "👨‍🌾" }
+        ],
+        // --- 認知基礎 ---
+        "🔢 數字 Numbers": [
+            { en: "One", zh: "1", speak: "One", icon: "1️⃣" },
+            { en: "Two", zh: "2", speak: "Two", icon: "2️⃣" },
+            { en: "Three", zh: "3", speak: "Three", icon: "3️⃣" },
+            { en: "Four", zh: "4", speak: "Four", icon: "4️⃣" },
+            { en: "Five", zh: "5", speak: "Five", icon: "5️⃣" },
+            { en: "Six", zh: "6", speak: "Six", icon: "6️⃣" },
+            { en: "Seven", zh: "7", speak: "Seven", icon: "7️⃣" },
+            { en: "Eight", zh: "8", speak: "Eight", icon: "8️⃣" },
+            { en: "Nine", zh: "9", speak: "Nine", icon: "9️⃣" },
+            { en: "Ten", zh: "10", speak: "Ten", icon: "🔟" }
+        ],
+        "🎨 顏色 Colors": [
+            { en: "Red", zh: "紅色", icon: "🟥" },
+            { en: "Blue", zh: "藍色", icon: "🟦" },
+            { en: "Yellow", zh: "黃色", icon: "🟨" },
+            { en: "Green", zh: "綠色", icon: "🟩" },
+            { en: "Orange", zh: "橘色", icon: "🟧" },
+            { en: "Purple", zh: "紫色", icon: "🟪" },
+            { en: "Pink", zh: "粉紅色", icon: "🌸" },
+            { en: "Black", zh: "黑色", icon: "⬛" },
+            { en: "White", zh: "白色", icon: "⬜" }
+        ],
+        "🔷 形狀 Shapes": [
+            { en: "Circle", zh: "圓形", icon: "🔴" },
+            { en: "Square", zh: "正方形", icon: "🟥" },
+            { en: "Triangle", zh: "三角形", icon: "🔺" },
+            { en: "Star", zh: "星星", icon: "⭐" },
+            { en: "Heart", zh: "愛心", icon: "❤️" }
+        ],
+        // --- 生活場景 ---
+        "👀 身體 Body": [
+            { en: "Head", zh: "頭", icon: "👦" },
+            { en: "Eye", zh: "眼睛", icon: "👁️" },
+            { en: "Nose", zh: "鼻子", icon: "👃" },
+            { en: "Mouth", zh: "嘴巴", icon: "👄" },
+            { en: "Ear", zh: "耳朵", icon: "👂" },
+            { en: "Hand", zh: "手", icon: "✋" },
+            { en: "Arm", zh: "手臂", icon: "💪" },
+            { en: "Leg", zh: "腿", icon: "🦵" },
+            { en: "Foot", zh: "腳", icon: "🦶" }
+        ],
+        "🛋️ 客廳 Living": [
+            { en: "Sofa", zh: "沙發", icon: "🛋️" },
+            { en: "TV", zh: "電視", icon: "📺" },
+            { en: "Table", zh: "桌子", icon: "🟫" },
+            { en: "Chair", zh: "椅子", icon: "🪑" },
+            { en: "Lamp", zh: "燈", icon: "💡" },
+            { en: "Fan", zh: "風扇", icon: "🌬️" }
+        ],
+        "🍳 廚房 Kitchen": [
+            { en: "Fridge", zh: "冰箱", icon: "❄️" },
+            { en: "Oven", zh: "烤箱", icon: "🥐" },
+            { en: "Pan", zh: "平底鍋", icon: "🍳" },
+            { en: "Pot", zh: "鍋子", icon: "🍲" },
+            { en: "Cup", zh: "杯子", icon: "🥤" },
+            { en: "Spoon", zh: "湯匙", icon: "🥄" }
         ]
     };
 
@@ -813,7 +801,7 @@
         const nav = document.getElementById('navBar');
         nav.innerHTML = '';
         
-        // 1. 加入「最愛」標籤
+        // 最愛標籤
         const favBtn = document.createElement('span');
         favBtn.className = `room-tab fav-tab ${currentRoom === 'favorites' ? 'active' : ''}`;
         favBtn.innerText = "❤️ 最愛";
@@ -823,7 +811,7 @@
         };
         nav.appendChild(favBtn);
 
-        // 2. 其他標籤
+        // 其他標籤
         Object.keys(db).forEach(room => {
             const btn = document.createElement('span');
             const isPhonics = room.includes("🔤");
@@ -842,7 +830,6 @@
         currentRoom = room;
         
         if (room === 'favorites') {
-            // 收集所有最愛
             let favItems = [];
             Object.keys(db).forEach(key => {
                 db[key].forEach(item => {
@@ -885,7 +872,7 @@
         }
     }
 
-    // --- Favorites Logic ---
+    // --- Favorites Logic (Enhanced UX) ---
     function toggleFavorite(event) {
         event.stopPropagation();
         if(activeItems.length === 0) return;
@@ -900,12 +887,11 @@
         }
         
         localStorage.setItem('eliza_favs', JSON.stringify(favorites));
-        renderFocusCard(); // Update Heart UI
         
-        // 如果當前在「最愛」分頁，要重新整理網格
-        if(currentRoom === 'favorites') {
-            loadRoom('favorites');
-        }
+        // 只更新 UI 狀態，不重新載入房間，避免專注模式跳掉
+        renderFocusCard(); 
+        
+        // 注意：如果在最愛房間，清單會在下次重整或切換視圖時更新
     }
 
     function cycleMode() {
@@ -920,12 +906,10 @@
         if(isFocusMode) renderFocusCard();
     }
 
-    // --- Render Grid ---
     function renderGrid() {
         const grid = document.getElementById('cardGrid');
         grid.innerHTML = '';
         
-        const isPhonics = currentRoom.includes("🔤");
         const config = modeConfigs[displayMode];
 
         grid.classList.remove('hide-zh', 'hide-en', 'hide-text');
@@ -946,7 +930,7 @@
             let visualContent = "";
             let topLabel = "";
 
-            if ((isPhonics || item.rule) && item.rule) { // Fix for favorite items retaining rule look
+            if ((item.rule)) {
                 topLabel = `<div class="rule-tag" style="background:${stringToDarkerColor(item.rule)}">${item.rule}</div>`;
                 visualContent = `<div class="card-img" style="background:${bgColor}">${item.icon}</div>`;
             } else if (item.code) {
@@ -973,34 +957,25 @@
         }
     }
 
-    // --- Audio Stream Helper (Persistent) ---
-    async function getAudioStream() {
-        if (globalStream && globalStream.active && globalStream.getAudioTracks()[0].readyState === 'live') {
-            return globalStream;
-        }
-        try {
-            globalStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            return globalStream;
-        } catch (err) {
-            console.error(err);
-            alert("請允許麥克風權限以使用錄音功能 (需 HTTPS)");
-            return null;
-        }
-    }
-
-    // --- Record Logic ---
+    // --- Audio Logic (iOS Fix: New Stream Every Time) ---
     async function toggleRecord(event, btn) {
         event.stopPropagation(); 
-
-        const stream = await getAudioStream();
-        if(!stream) return;
 
         const container = btn.parentElement;
         if (container.classList.contains('recording')) return;
 
-        // 偷渡播放器
-        playbackAudio.src = ""; 
-        playbackAudio.load(); 
+        // 1. Silent Unlock (Crucial for iOS)
+        playbackAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAgAAAA==';
+        playbackAudio.play().catch(() => {});
+
+        // 2. Request Fresh Stream (Crucial for iOS to prevent cut-off)
+        let stream = null;
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } catch (err) {
+            alert("無法錄音，請檢查權限或 HTTPS。");
+            return;
+        }
 
         try {
             let options = {};
@@ -1020,9 +995,12 @@
                 const audioUrl = URL.createObjectURL(audioBlob);
                 
                 playbackAudio.src = audioUrl;
-                playbackAudio.play().catch(e => console.log("播放失敗:", e));
+                playbackAudio.play().catch(e => console.log("Playback failed", e));
                 
                 container.classList.remove('recording');
+                
+                // Stop tracks to release hardware
+                stream.getTracks().forEach(track => track.stop());
             };
 
             mediaRecorder.start();
@@ -1035,17 +1013,16 @@
             }, 2000); 
 
         } catch (err) {
-            console.error("Recording Error:", err);
+            console.error("Recorder Error:", err);
         }
     }
 
-    // --- Snail Slow Speak ---
     function playSlow(event) {
         event.stopPropagation();
         if(activeItems.length === 0) return;
         const item = activeItems[focusIndex];
         const text = item.speak ? item.speak : item.en;
-        speak(text, 0.5); // 0.5 rate
+        speak(text, 0.5); 
     }
 
     function handleClick(item, cardElem, index) {
@@ -1058,11 +1035,8 @@
                 setTimeout(() => cardElem.style.transform = "", 200);
             }
 
-            // Fix: Check if item belongs to phonics rule, not just current room name
-            // because "Favorites" might contain phonics cards.
-            const isPhonicsItem = item.rule !== undefined;
-            
-            if (!isPhonicsItem && !isFocusMode) {
+            const isPhonicsCategory = item.rule !== undefined;
+            if (!isPhonicsCategory && !isFocusMode) {
                 currentItem = item;
                 openImageModal(item);
             }
@@ -1229,8 +1203,7 @@
         loader.innerText = "🔍 搜尋網路美圖...";
         let keyword = keywordRaw.split(" ")[0].toLowerCase();
         let searchPath = keyword;
-        // Fix: Use generic logic for searching landscapes if needed, or keep specific rooms
-        if (keyword === 'taiwan' || keyword === 'world') {
+        if (currentRoom.includes("World") || currentRoom.includes("地圖")) {
              searchPath = `${keyword},landscape,landmark/all`;
         }
         const randomLock = Math.floor(Math.random() * 10000);
